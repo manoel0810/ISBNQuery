@@ -67,6 +67,7 @@ namespace InterfaceTeste
                 Console.WriteLine(" /ib10: Fornece suporte à dados isbn10, retornando um objeto Book");
                 Console.WriteLine(" /ib13: Fornece suporte à dados isbn13, retornando um objeto Book");
                 Console.WriteLine(" /conv: Converte um ISBN10 em ISBN13 e vice-versa");
+                Console.WriteLine(" /comp: Verifica se dois inputs são iguais <arg1> == <arg2> ? ");
                 Console.WriteLine(" /help: Exibe esta ajuda de opções");
                 Console.WriteLine("\n---------------------------------------- ***** ----------------------------------------");
                 return;
@@ -83,6 +84,32 @@ namespace InterfaceTeste
             else if (args[0].Equals("/ib10")) { ISBN10Utility(args[1]); }
             else if (args[0].Equals("/ib13")) { ISBN13Utility(args[1]); }
             else if (args[0].Equals("/conv")) { ConverteISBN(args[1]); }
+            else if (args[0].Equals("/comp"))
+                if(args.Length < 3)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Número inválido de argumentos para [/comp]");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    return;
+                }
+                else
+                {
+                    bool VERIFI = args[1].Equals(args[2]);
+                    if (VERIFI)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkGreen;
+                        Console.WriteLine("Or argumentos são iguais");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Or argumentos são iguais");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return;
+                    }
+                }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;

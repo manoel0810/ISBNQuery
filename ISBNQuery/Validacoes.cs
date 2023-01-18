@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Management;
 using System.Windows.Forms;
 
@@ -24,6 +25,34 @@ namespace ISBNQuery
             {@"\u00c3", "Ã" },  {@"\u00ec", "ì" },    {@"\u00f5", "õ"},    {@"\u00fc", "ü"},
             {@"\u00c4", "Ä" },  {@"\u00ee", "î" },    {@"\u00f6", "ö"},    {@"\u00da", "Ú"},
         };
+
+        /// <summary>
+        /// Obtém o unicode de união de um caractere
+        /// </summary>
+        /// <param name="u">Identidade Unicode HEX</param>
+        /// <returns>Char unicode</returns>
+
+        private static char GetUnicode(string u)
+        {
+            Dictionary<string, char> Unicodes = new Dictionary<string, char>(){
+
+                {"0300", '\u0300'},
+                {"0301", '\u0301'},
+                {"0302", '\u0302'},
+                {"0303", '\u0303'},
+                {"0304", '\u0304'},
+                {"0308", '\u0308'},
+                {"0327", '\u0327'},
+            };
+
+            foreach (KeyValuePair<string, char> KVP in Unicodes)
+            {
+                if (KVP.Key == u)
+                    return KVP.Value;
+            }
+
+            return Char.MinValue;
+        }
 
         /// <summary>
         /// Verifica a conexão com a internet
@@ -132,11 +161,57 @@ namespace ISBNQuery
 
         public static string FormatUF8(string NonUTF8)
         {
+
             string UpdatingSTG = NonUTF8.Replace("\\", @"\");
             foreach (KeyValuePair<string, string> KVP in Acentos)
                 UpdatingSTG = UpdatingSTG.Replace(KVP.Key, KVP.Value);
 
             return UpdatingSTG;
+        }
+
+        /// <summary>
+        /// Retorna uma cadeia de caracteres formatada com acentos especiais e sinais, com base em cobinação de caracteres
+        /// </summary>
+        /// <param name="s">Cadeia de caracteres Unicode</param>
+        /// <returns>Uma string formatada em UTF-8</returns>
+
+        public static string FormatUnicodeCaracters(string s)
+        {
+            string NS = string.Empty;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (i + 2 >= s.Length)
+                {
+                    NS += s[i];
+                    goto END;
+                }
+
+                if (s[i + 1] == 92 && s[i + 1] == 92)
+                {
+                    string u = s[i].ToString();
+                    u += GetUnicode(s.Substring(i + 3, 4));
+                    NS += u.Normalize();
+                    i += 6;
+                }
+                else
+                    NS += s[i];
+
+                END:;
+            }
+
+            return NS;
+        }
+
+        /// <summary>
+        /// Força a formatação da cadeia de caracteres, usando dois modelos base
+        /// </summary>
+        /// <param name="s">String com caracteres Unicode</param>
+        /// <returns>Texto formatado</returns>
+        /// 
+
+        public static string FullFormat(string s)
+        {
+            return FormatUnicodeCaracters(FormatUF8(s));
         }
 
         /// <summary>
@@ -189,8 +264,10 @@ namespace ISBNQuery
                 ManagementObjectCollection information = searcher.Get();
                 if (information != null)
                 {
-                    foreach (ManagementObject obj in information)
+                    foreach (ManagementObject obj in information.Cast<ManagementObject>())
+                    {
                         r = obj["Caption"].ToString() + " - " + obj["OSArchitecture"].ToString();
+                    }
                 }
                 r = r.Replace("NT 5.1.2600", "XP");
                 r = r.Replace("NT 5.2.3790", "Server 2003");

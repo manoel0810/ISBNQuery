@@ -251,7 +251,7 @@ namespace ISBNQuery
                     {
                         string Formated = Argument.Trim();
                         if (Tag == "title")
-                            book.Title = Validacoes.FormatUF8(@GetAttribute(Formated));
+                            book.Title = Validacoes.FullFormat(@GetAttribute(Formated));
                         else if (Tag == "isbn_10")
                             book.ISBN10 = GetAttribute(Formated);
                         else if (Tag == "isbn_13")
@@ -261,7 +261,7 @@ namespace ISBNQuery
                         else if (Tag == "source_records")
                             book.Source_Records = GetAttribute(Formated);
                         else if (Tag == "publishers")
-                            book.Publishers = GetAttribute(Formated);
+                            book.Publishers = Validacoes.FullFormat(GetAttribute(Formated));
                         else if (Tag == "physical_format")
                             book.Physical_Format = GetAttribute(Formated);
                         else if (Tag == "authors")
@@ -291,7 +291,7 @@ namespace ISBNQuery
                     string[] Argumentos = Content.Split('|');
                     foreach (string Argument in Argumentos)
                         if (Argument.Contains($"'name':"))
-                            book.Author = Validacoes.FormatUF8(GetAttribute(Argument));
+                            book.Author = Validacoes.FullFormat(GetAttribute(Argument));
                 }
             }
             catch (Exception ex)
@@ -359,7 +359,7 @@ namespace ISBNQuery
                 foreach (int i in Valores)
                     part += i.ToString();
 
-                return String.Format("{0}{1}", part, digito);
+                return String.Format("{0}{1}", part, digito != 10 ? digito.ToString() : "X");
             }
             else
             {
