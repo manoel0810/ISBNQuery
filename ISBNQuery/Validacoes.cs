@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using System.Net.NetworkInformation;
 using System.Windows.Forms;
 
 namespace ISBNQuery
@@ -60,6 +61,7 @@ namespace ISBNQuery
         /// <param name="UserDefine">Recebe um host para ping definido pelo usuário. O padrão é: google.com</param>
         /// <returns><b>true</b> se a conexão ocorrer com sucesso</returns>
 
+        [Obsolete]
         public static bool Internet(Uri UserDefine = null)
         {
             Uri url = UserDefine ?? new Uri("https://www.google.com.br");
@@ -72,6 +74,27 @@ namespace ISBNQuery
                 WebRs.Close();
                 WebR = null;
                 return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verifica a conexão com a internet
+        /// </summary>
+        /// <param name="URL">Url para ping-test</param>
+        /// <param name="Timeout">Tempo de aguado para resposta</param>
+        /// <returns><i>true</i> se a conexão ocorrer bem</returns>
+
+        public static bool CheckInternet(string URL = "www.google.com", int Timeout = 3000)
+        {
+            Ping ping = new Ping();
+            try
+            {
+                PingReply reply = ping.Send(URL, Timeout);
+                return (reply.Status == IPStatus.Success);
             }
             catch
             {

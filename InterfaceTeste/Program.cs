@@ -1,5 +1,6 @@
 ﻿using ISBNQuery;
 using System;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace InterfaceTeste
@@ -68,6 +69,7 @@ namespace InterfaceTeste
                 Console.WriteLine(" /ib13: Fornece suporte à dados isbn13, retornando um objeto Book");
                 Console.WriteLine(" /conv: Converte um ISBN10 em ISBN13 e vice-versa");
                 Console.WriteLine(" /comp: Verifica se dois inputs são iguais <arg1> == <arg2> ? ");
+                Console.WriteLine(" /img:  Obtém a imagem associado a um ISBN. Requer -Ss <s, m, l> e -K <isbn>");
                 Console.WriteLine(" /help: Exibe esta ajuda de opções");
                 Console.WriteLine("\n---------------------------------------- ***** ----------------------------------------");
                 return;
@@ -85,7 +87,7 @@ namespace InterfaceTeste
             else if (args[0].Equals("/ib13")) { ISBN13Utility(args[1]); }
             else if (args[0].Equals("/conv")) { ConverteISBN(args[1]); }
             else if (args[0].Equals("/comp"))
-                if(args.Length < 3)
+                if (args.Length < 3)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("Número inválido de argumentos para [/comp]");
@@ -110,6 +112,87 @@ namespace InterfaceTeste
                         return;
                     }
                 }
+            else if (args[0].Equals("/img"))
+            {
+                if (args.Length < 5)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Número inválido de argumentos para [/img]");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    return;
+                }
+                else
+                {
+                    char Op = '\0';
+                    string KEY = string.Empty;
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        if (args[i] == "-Ss")
+                            Op = char.ToUpper(args[i + 1][0]);
+                        else if (args[i] == "-K")
+                            KEY = args[i + 1];
+                    }
+
+                    if (Op == '\0')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Não foi possível encontrar o argumento [-Ss]");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return;
+                    }
+                    else if (Op != 'S' && Op != 'M' && Op != 'L')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Argumento inválido para -Ss. Os parâmetros aceitos são: S, M, L");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        return;
+                    }
+                    else
+                    {
+                        //System.Drawing.Image IMG = null;
+                        byte[] Bytes = new byte[] { };
+                        switch (Op)
+                        {
+                            case 'S':
+                                Bytes = Consultas.GetImage(Consultas.ImageSize.S, KEY);
+                                //IMG = Consultas.GetImageFromByteArray(Bytes);
+                                break;
+                            case 'M':
+                                Bytes = Consultas.GetImage(Consultas.ImageSize.M, KEY);
+                                //IMG = Consultas.GetImageFromByteArray(Bytes);
+                                break;
+                            case 'L':
+                                Bytes = Consultas.GetImage(Consultas.ImageSize.L, KEY);
+                                //IMG = Consultas.GetImageFromByteArray(Bytes);
+                                break;
+                        }
+
+                        try
+                        {
+                            string PATH = $"{Environment.CurrentDirectory}\\img_key{KEY}_size_{Op}.jpeg";
+                            /*
+                            using (FileStream stream = new FileStream(PATH, FileMode.Create))
+                            {
+                                // Salva a imagem no fluxo de arquivo
+                                IMG.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+                            }
+                            */
+
+                            File.WriteAllBytes(PATH, Bytes);
+                            Console.WriteLine("A imagem foi salva no diretório do programa");
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Não foi possível recuperar a imagem ou salvar. Verifique se os parâmetros estão corretos. ERRO:\n{e.Message}");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            return;
+                        }
+
+                    }
+                }
+            }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;

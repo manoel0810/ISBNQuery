@@ -60,7 +60,7 @@ namespace ISBNQuery
             ISBN13 = ISBN13.Replace("-", "").Replace(".", "");
 
             if (InternetCheck)
-                if (!Validacoes.Internet())
+                if (!Validacoes.CheckInternet())
                 {
                     MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
@@ -72,18 +72,19 @@ namespace ISBNQuery
         }
 
         /// <summary>
-        /// <br>pt-br: Tenta recuperar de forma online as informações associadas a um <b>ISBN-13</b> e antes verifica a conexão com a internet no <b>Uri</b> passado</br>
-        /// <br>en-us: Attempts to retrieve the information associated with an <b>ISBN-13</b> online and first checks the internet connection in the past <b>Uri</b></br>
+        /// <br>pt-br: Tenta recuperar de forma online as informações associadas a um <b>ISBN-13</b> e antes verifica a conexão com a internet no <b>Url</b> passado</br>
+        /// <br>en-us: Attempts to retrieve the information associated with an <b>ISBN-13</b> online and first checks the internet connection in the past <b>Url</b></br>
         /// </summary>
         /// <param name="ISBN13">Recebe o código <b>ISBN-13</b> que será verificado</param>
-        /// <param name="PingAt">Recebe o <b>Uri</b> que servirá de base para o teste de conexão</param>
+        /// <param name="Url">Recebe o <b>Url</b> que servirá de base para o teste de conexão</param>
+        /// <param name="Timeout">Tempo de aguardo para a conexão em ms</param>
         /// <returns>Retorna um objeto do tipo <b>Book</b></returns>
 
-        public static Book ConsultarISBN13(string ISBN13, Uri PingAt)
+        public static Book ConsultarISBN13(string ISBN13, string Url, int Timeout = 3000)
         {
             ISBN13 = ISBN13.Replace("-", "").Replace(".", "");
 
-            if (!Validacoes.Internet(PingAt))
+            if (!Validacoes.CheckInternet(Url, Timeout))
             {
                 MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
@@ -152,7 +153,7 @@ namespace ISBNQuery
             ISBN10 = ISBN10.Replace("-", "").Replace(".", "");
 
             if (InternetCheck)
-                if (!Validacoes.Internet())
+                if (!Validacoes.CheckInternet())
                 {
                     MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return null;
@@ -164,18 +165,19 @@ namespace ISBNQuery
         }
 
         /// <summary>
-        /// <br>pt-br: Tenta recuperar de forma online as informações associadas a um <b>ISBN-10</b> e antes verifica a conexão com a internet no <b>Uri</b> passado</br>
-        /// <br>en-us: Attempts to retrieve the information associated with an <b>ISBN-10</b> online and first checks the internet connection in the past <b>Uri</b></br>
+        /// <br>pt-br: Tenta recuperar de forma online as informações associadas a um <b>ISBN-10</b> e antes verifica a conexão com a internet no <b>Url</b> passado</br>
+        /// <br>en-us: Attempts to retrieve the information associated with an <b>ISBN-10</b> online and first checks the internet connection in the past <b>Url</b></br>
         /// </summary>
         /// <param name="ISBN10">Recebe o código <b>ISBN-10</b> que será verificado</param>
-        /// <param name="PingAt">Recebe o <b>Uri</b> que servirá de base para o teste de conexão</param>
+        /// <param name="Url">Recebe o <b>Url</b> que servirá de base para o teste de conexão</param>
+        /// <param name="Timeout">Tempo de aguardo para a conexão em ms</param>
         /// <returns>Retorna um objeto do tipo <b>Book</b></returns>
 
-        public static Book ConsultarISBN10(string ISBN10, Uri PingAt)
+        public static Book ConsultarISBN10(string ISBN10, string Url, int Timeout = 3000)
         {
             ISBN10 = ISBN10.Replace("-", "").Replace(".", "");
 
-            if (!Validacoes.Internet(PingAt))
+            if (!Validacoes.CheckInternet(Url, Timeout))
             {
                 MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return null;
@@ -369,6 +371,72 @@ namespace ISBNQuery
         }
 
         /// <summary>
+        /// Obtém a capa do livro solicitado
+        /// </summary>
+        /// <param name="Size">Tamanho da imagem disponível pela API</param>
+        /// <param name="KEY">Chave de busca $ISBN</param>
+        /// <returns>Retorna a imagem no formato ByteArray[]</returns>
+
+        public static byte[] GetImage(ImageSize Size, string KEY)
+        {
+            string MASK = $"https://covers.openlibrary.org/b/isbn/{KEY}-{(char)Size}.jpg";
+            byte[] IMAGE = null;
+
+            try
+            {
+                using (WebClient Cliente = new WebClient())
+                {
+                    IMAGE = Cliente.DownloadData(MASK);
+                }
+
+                //API RETURN: Image Not Found (1 Pixel image returned)
+                if (IMAGE.Length == 807)
+                    return new byte[] { };
+                else
+                    return IMAGE; //Image found
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Converte um array de bytes na sua imagem correspondente
+        /// </summary>
+        /// <param name="bytes">Bytes da imagem</param>
+        /// <returns>Imagem convertida</returns>
+
+        public static System.Drawing.Image GetImageFromByteArray(byte[] bytes)
+        {
+            try
+            {
+                using (System.IO.MemoryStream Stream = new System.IO.MemoryStream(bytes))
+                {
+                    var IMG = System.Drawing.Image.FromStream(Stream);
+                    return IMG;
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
+        /// <summary>
+        /// Obtém diretamente a imagem, executando as rotidas já existentes individuais
+        /// </summary>
+        /// <param name="Size">Tamanho da imagem disponibilizada pela API</param>
+        /// <param name="KEY">Chave de consulta $ISBN</param>
+        /// <returns>Imagem do $KEY passado no tamanho $SIZE</returns>
+
+        public static System.Drawing.Image GetCompostImage(ImageSize Size, string KEY)
+        {
+            var bytes = GetImage(Size, KEY);
+            return GetImageFromByteArray(bytes);
+        }
+
+        /// <summary>
         ///         <br><b>** Método de controle interno **</b></br>
         ///         <br>Este método recupera a informação associada a uma <b>Tag</b> no arquivo JSON</br>
         /// </summary>
@@ -380,6 +448,28 @@ namespace ISBNQuery
             string Formated = Sequo.Trim().Replace("[", "").Replace("]", "");
             Formated = Formated.Substring(Formated.IndexOf(':') + 0x2).Replace("'", "").Trim();
             return Formated;
+        }
+
+        /// <summary>
+        /// Tamanhos disponíveis da imagem
+        /// </summary>
+
+        [Flags]
+
+        public enum ImageSize : int
+        {
+            /// <summary>
+            /// Small size
+            /// </summary>
+            S = 83,
+            /// <summary>
+            /// Medium size
+            /// </summary>
+            M = 77,
+            /// <summary>
+            /// Large size
+            /// </summary>
+            L = 76
         }
     }
 }
