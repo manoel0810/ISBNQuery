@@ -159,7 +159,7 @@ namespace InterfaceTeste
                                 break;
                             case 'M':
                                 Bytes = Consultas.GetImage(Consultas.ImageSize.M, KEY);
-                                //IMG = Consultas.GetImageFromByteArray(Bytes);
+                                //var IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'L':
                                 Bytes = Consultas.GetImage(Consultas.ImageSize.L, KEY);

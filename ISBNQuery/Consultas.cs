@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Net;
 using System.Windows.Forms;
 
@@ -407,13 +408,16 @@ namespace ISBNQuery
         /// <param name="bytes">Bytes da imagem</param>
         /// <returns>Imagem convertida</returns>
 
-        public static System.Drawing.Image GetImageFromByteArray(byte[] bytes)
+        public static Image GetImageFromByteArray(byte[] bytes)
         {
+            if (bytes.Length == 0)
+                return null;
+
             try
             {
                 using (System.IO.MemoryStream Stream = new System.IO.MemoryStream(bytes))
                 {
-                    var IMG = System.Drawing.Image.FromStream(Stream);
+                    var IMG = Image.FromStream(Stream);
                     return IMG;
                 }
             }
@@ -430,9 +434,12 @@ namespace ISBNQuery
         /// <param name="KEY">Chave de consulta $ISBN</param>
         /// <returns>Imagem do $KEY passado no tamanho $SIZE</returns>
 
-        public static System.Drawing.Image GetCompostImage(ImageSize Size, string KEY)
+        public static Image GetCompostImage(ImageSize Size, string KEY)
         {
             var bytes = GetImage(Size, KEY);
+            if(bytes.Length == 0)         
+                return null;          
+
             return GetImageFromByteArray(bytes);
         }
 
