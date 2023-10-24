@@ -111,17 +111,17 @@ namespace ISBNQuery
         public static ReturnType CheckISBN13(string ISBN13)
         {
             if (!Numeric(ISBN13))
-                return ReturnType.FORMAT_INPUT_INCORRECT;
+                return ReturnType.InvalidInputFormat;
 
             if (string.IsNullOrEmpty(ISBN13))
             {
                 MessageBox.Show("O argumento [ISBN13] não pode ser nulo", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return ReturnType.ARGUMENT_NULL;
+                return ReturnType.NullArgumentException;
             }
             else if (ISBN13.Length != 0xd /*13DEC*/)
             {
                 MessageBox.Show("O argumento [ISBN13] deve ter tamanho fixo igual a 13 (treze)", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return ReturnType.ISBN13_TAM_NON_MATCH;
+                return ReturnType.ISBN13LenghtError;
             }
 
             int[] Produtos = new int[0xc], ISBN = new int[0xd];
@@ -134,9 +134,9 @@ namespace ISBNQuery
             Soma(Produtos, out int Resultado);
             int Test = (Resultado + ISBN[0xc]) % 0xa;
             if (Test == 0x0)
-                return ReturnType.ISBN13_VALIDO;
+                return ReturnType.ValidISBN13;
             else
-                return ReturnType.ISBN13_INVALIDO;
+                return ReturnType.InvalidISBN13;
         }
 
         /// <summary>
@@ -148,17 +148,17 @@ namespace ISBNQuery
         public static ReturnType CheckISBN10(string ISBN10)
         {
             if (!Numeric(ISBN10, true))
-                return ReturnType.FORMAT_INPUT_INCORRECT;
+                return ReturnType.InvalidInputFormat;
 
             if (string.IsNullOrEmpty(ISBN10))
             {
                 MessageBox.Show("O argumento [ISBN10] não pode ser nulo", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return ReturnType.ARGUMENT_NULL;
+                return ReturnType.NullArgumentException;
             }
             else if (ISBN10.Length != 0xa /*10DEC*/)
             {
                 MessageBox.Show("O argumento [ISBN10] deve ter tamanho fixo igual a 10 (dez)", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return ReturnType.ISBN10_TAM_NON_MATCH;
+                return ReturnType.ISBN10LenghtError;
             }
 
             int[] Produtos = new int[0x9], ISBN = new int[0xa];
@@ -171,9 +171,9 @@ namespace ISBNQuery
             Soma(Produtos, out int Resultado);
             int Test = Resultado % 0xb;
             if (Test == ISBN[0x9])
-                return ReturnType.ISBN10_VALIDO;
+                return ReturnType.ValidISBN10;
             else
-                return ReturnType.ISBN10_INVALIDO;
+                return ReturnType.InvalidISBN10;
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace ISBNQuery
         /// <param name="NonUTF8">Recebe a string que deve ser formatada</param>
         /// <returns>Uma string formatada em <b>UTF-8</b></returns>
 
-        public static string FormatUF8(string NonUTF8)
+        public static string FormatUTF8(string NonUTF8)
         {
 
             string UpdatingSTG = NonUTF8.Replace("\\", @"\");
@@ -234,7 +234,7 @@ namespace ISBNQuery
 
         public static string FullFormat(string s)
         {
-            return FormatUnicodeCaracters(FormatUF8(s));
+            return FormatUnicodeCaracters(FormatUTF8(s));
         }
 
         /// <summary>
@@ -292,6 +292,7 @@ namespace ISBNQuery
                         r = obj["Caption"].ToString() + " - " + obj["OSArchitecture"].ToString();
                     }
                 }
+
                 r = r.Replace("NT 5.1.2600", "XP");
                 r = r.Replace("NT 5.2.3790", "Server 2003");
             }
@@ -299,49 +300,51 @@ namespace ISBNQuery
         }
 
 
-        /// <summary>
-        /// Retornos possíveis da validação
-        /// </summary>
 
-        [Flags]
-        public enum ReturnType : int
-        {
-            /// <summary>
-            /// Indica que o ISBN-13 passado é válido
-            /// </summary>
-            ISBN13_VALIDO = 0x0,
-            /// <summary>
-            /// Indica que o ISBN-13 passado é inválido
-            /// </summary>
-            ISBN13_INVALIDO = 0x1,
-            /// <summary>
-            /// Indica que o tamanho do fluxo de caracteres do código ISBN-13 difere de 13 dígitos
-            /// </summary>
-            ISBN13_TAM_NON_MATCH = 0x2,
-            /// <summary>
-            /// Indica que o ISBN-10 é válido
-            /// </summary>
-            ISBN10_VALIDO = 0x3,
-            /// <summary>
-            /// Indica que o ISBN-10 é inválido
-            /// </summary>
-            ISBN10_INVALIDO = 0x4,
-            /// <summary>
-            /// Indica que o tamanho do fluxo de caracteres do código ISBN-10 difere de 10 dígitos
-            /// </summary>
-            ISBN10_TAM_NON_MATCH = 0x5,
-            /// <summary>
-            /// Indica que ocorreu um erro na operação de validação
-            /// </summary>
-            OPERATION_ERROR = 0x6,
-            /// <summary>
-            /// Indica que a entrada do método de verificação foi <c>null</c>
-            /// </summary>
-            ARGUMENT_NULL = 0x7,
-            /// <summary>
-            /// Indica que o formato de entrada do fluxo do código ISBN era inválido
-            /// </summary>
-            FORMAT_INPUT_INCORRECT = 0x8
-        }
+    }
+
+    /// <summary>
+    /// Retornos possíveis da validação
+    /// </summary>
+
+    [Flags]
+    public enum ReturnType : int
+    {
+        /// <summary>
+        /// Indica que o ISBN-13 passado é válido
+        /// </summary>
+        ValidISBN13 = 0x0,
+        /// <summary>
+        /// Indica que o ISBN-13 passado é inválido
+        /// </summary>
+        InvalidISBN13 = 0x1,
+        /// <summary>
+        /// Indica que o tamanho do fluxo de caracteres do código ISBN-13 difere de 13 dígitos
+        /// </summary>
+        ISBN13LenghtError = 0x2,
+        /// <summary>
+        /// Indica que o ISBN-10 é válido
+        /// </summary>
+        ValidISBN10 = 0x3,
+        /// <summary>
+        /// Indica que o ISBN-10 é inválido
+        /// </summary>
+        InvalidISBN10 = 0x4,
+        /// <summary>
+        /// Indica que o tamanho do fluxo de caracteres do código ISBN-10 difere de 10 dígitos
+        /// </summary>
+        ISBN10LenghtError = 0x5,
+        /// <summary>
+        /// Indica que ocorreu um erro na operação de validação
+        /// </summary>
+        InternalError = 0x6,
+        /// <summary>
+        /// Indica que a entrada do método de verificação foi <c>null</c>
+        /// </summary>
+        NullArgumentException = 0x7,
+        /// <summary>
+        /// Indica que o formato de entrada do fluxo do código ISBN era inválido
+        /// </summary>
+        InvalidInputFormat = 0x8
     }
 }

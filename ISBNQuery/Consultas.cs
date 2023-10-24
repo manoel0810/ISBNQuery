@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ISBNQuery.Erros;
+using Newtonsoft.Json;
+using System;
 using System.Drawing;
 using System.Net;
-using System.Windows.Forms;
+using System.Reflection;
+using FormatException = ISBNQuery.Erros.FormatException;
 
 namespace ISBNQuery
 {
@@ -13,19 +15,66 @@ namespace ISBNQuery
 
     public class Consultas
     {
-        private static readonly List<string> Tags = new List<string>
+        /// <summary>
+        /// Obtém a versão atual da dll
+        /// </summary>
+        public static string GetCallingAssemblyVersion()
         {
-            "authors",
-            "title",
-            "isbn_10",
-            "isbn_13",
-            "publish_date",
-            "source_records",
-            "publishers",
-            "physical_format",
-            "latest_revision"
-         };
+            Assembly callingAssembly = Assembly.GetCallingAssembly();
+            AssemblyFileVersionAttribute fileVersionAttr = callingAssembly.GetCustomAttribute<AssemblyFileVersionAttribute>();
+            if (fileVersionAttr != null)
+            {
+                return fileVersionAttr.Version;
+            }
 
+            // Se o atributo [AssemblyFileVersion] não estiver definido, retorne a versão do assembly.
+            return callingAssembly.GetName().Version.ToString();
+        }
+
+        private static void FormatISBN(ref string isbn)
+        {
+            isbn = isbn.Replace("-", "").Replace(".", "").Replace(" ", "").Trim();
+        }
+
+        private static Book ExecuteProcedures(string Key)
+        {
+            var check = Key.Length == 10 ? ReturnType.ValidISBN10 : ReturnType.ValidISBN13;
+            if ((Key.Length == 13 ? Validacoes.CheckISBN13(Key) : Validacoes.CheckISBN10(Key)) == check)
+            {
+                try
+                {
+                    using (WebClient Client = new WebClient())
+                    {
+                        if (Validacoes.WindowsVersion().Contains("Windows 7"))
+                        {
+                            ServicePointManager.Expect100Continue = true;
+                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                        }
+
+                        string searchKey = $"https://openlibrary.org/api/books?bibkeys=ISBN:{Key}&jscmd=details&format=json";
+                        string Content = Client.DownloadString(searchKey);
+                        if (string.IsNullOrEmpty(Content) || Content.Length <= 4)
+                        {
+                            throw new ApiRequestJsonError($"API Request not found for: {searchKey}", new Exception());
+                        }
+
+                        Book book = TryCreateObject(Content, Key.Length == 10 ? 15 : 18);
+                        return book;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message.Contains("404"))
+                        throw new InternetException404("O servidor remoto não encontrou o ISBN passado ou está offline", ex);
+                    else
+                        throw new InternetException("Ocorreu um erro no processo de criação do objeto 'Book'", ex);
+                }
+            }
+            else
+            {
+                throw new FormatException("ISBN format error", new Exception(), ReturnType.InvalidISBN13);
+            }
+        }
 
         /// <summary>
         /// <br>pt-br: Tenta recuperar de forma online as informações associadas a um <b>ISBN</b> e antes verifica a conexão com a internet no host <b>google.com</b></br>
@@ -37,15 +86,15 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN(string ISBN, bool InternetCheck)
         {
-            string COD = ISBN.Replace(".", "").Replace("-", "").Replace(" ", "");
-            if (COD.Length.Equals(10))
+            string Code = ISBN;
+            FormatISBN(ref Code);
+
+            if (Code.Length.Equals(10))
                 return ConsultarISBN10(ISBN, InternetCheck);
-            else if (COD.Length.Equals(13))
+            else if (Code.Length.Equals(13))
                 return ConsultarISBN13(ISBN, InternetCheck);
             else
-                MessageBox.Show("The ISBN code isn't ISBN10 or ISBN13", "ISBN Check", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-            return null;
+                throw new FormatExceptionArgument("The ISBN code isn't ISBN10 or ISBN13", new Exception(), ReturnType.InvalidInputFormat);
         }
 
         /// <summary>
@@ -58,13 +107,11 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN13(string ISBN13, bool InternetCheck)
         {
-            ISBN13 = ISBN13.Replace("-", "").Replace(".", "");
-
+            FormatISBN(ref ISBN13);
             if (InternetCheck)
                 if (!Validacoes.CheckInternet())
                 {
-                    MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return null;
+                    throw new InternetException("No internet access detected", new Exception());
                 }
                 else
                     return ConsultarISBN13(ISBN13);
@@ -83,12 +130,10 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN13(string ISBN13, string Url, int Timeout = 3000)
         {
-            ISBN13 = ISBN13.Replace("-", "").Replace(".", "");
-
+            FormatISBN(ref ISBN13);
             if (!Validacoes.CheckInternet(Url, Timeout))
             {
-                MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return null;
+                throw new InternetException("No internet access detected", new Exception());
             }
             else
                 return ConsultarISBN13(ISBN13);
@@ -103,42 +148,8 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN13(string ISBN13)
         {
-            ISBN13 = ISBN13.Replace("-", "").Replace(".", "");
-
-            if (Validacoes.CheckISBN13(ISBN13) == Validacoes.ReturnType.ISBN13_VALIDO)
-            {
-                try
-                {
-                    using (WebClient Client = new WebClient())
-                    {
-                        if (Validacoes.WindowsVersion().Contains("Windows 7"))
-                        {
-                            ServicePointManager.Expect100Continue = true;
-                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                        }
-
-                        string Content = Client.DownloadString($"https://openlibrary.org/isbn/{ISBN13}.json").Replace("\"", "'").Replace("',", "'|").Replace("],", "]|").Replace("},", "}|");
-                        Book book = TryCreateObject(Tags, Content);
-                        return book;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message.Contains("404"))
-                    {
-                        MessageBox.Show("O servidor remoto não encontrou o ISBN passado ou está offline", "Consultas", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return null;
-                    }
-
-                    MessageBox.Show($"Ocorreu um erro no processo de criação do objeto 'Book'\nERRO:{ex.Message}", "Error - Deserialização json", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return null;
-                }
-            }
-            else
-            {
-                MessageBox.Show("Não foi possível construir o objeto 'Book'", "Erro - Object", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return null;
-            }
+            FormatISBN(ref ISBN13);
+            return ExecuteProcedures(ISBN13);
         }
 
         /// <summary>
@@ -151,13 +162,11 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN10(string ISBN10, bool InternetCheck)
         {
-            ISBN10 = ISBN10.Replace("-", "").Replace(".", "");
-
+            FormatISBN(ref ISBN10);
             if (InternetCheck)
                 if (!Validacoes.CheckInternet())
                 {
-                    MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return null;
+                    throw new InternetException("No internet access detected", new Exception());
                 }
                 else
                     return ConsultarISBN10(ISBN10);
@@ -176,12 +185,10 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN10(string ISBN10, string Url, int Timeout = 3000)
         {
-            ISBN10 = ISBN10.Replace("-", "").Replace(".", "");
-
+            FormatISBN(ref ISBN10);
             if (!Validacoes.CheckInternet(Url, Timeout))
             {
-                MessageBox.Show("No internet access detected", "InternetCheck", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return null;
+                throw new InternetException("No internet access detected", new Exception());
             }
             else
                 return ConsultarISBN10(ISBN10);
@@ -196,123 +203,48 @@ namespace ISBNQuery
 
         public static Book ConsultarISBN10(string ISBN10)
         {
-            ISBN10 = ISBN10.Replace("-", "").Replace(".", "");
+            FormatISBN(ref ISBN10);
+            return ExecuteProcedures(ISBN10);
+        }
 
-            if (Validacoes.CheckISBN10(ISBN10) == Validacoes.ReturnType.ISBN10_VALIDO)
+        static void ReplaceSubstring(ref string original, int startIndex, int length, string substitute)
+        {
+            if (startIndex < 0 || startIndex >= original.Length || length < 0 || startIndex + length > original.Length)
             {
-                try
-                {
-                    using (WebClient Client = new WebClient())
-                    {
-                        if (Validacoes.WindowsVersion().Contains("Windows 7"))
-                        {
-                            ServicePointManager.Expect100Continue = true;
-                            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-                        }
-
-                        string Content = Client.DownloadString($"https://openlibrary.org/isbn/{ISBN10}.json").Replace("\"", "'").Replace("',", "'|").Replace("],", "]|").Replace("},", "}|");
-                        Book book = TryCreateObject(Tags, Content);
-                        return book;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message.Contains("404"))
-                    {
-                        MessageBox.Show("O servidor remoto não encontrou o ISBN passado ou está offline", "Consultas", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        return null;
-                    }
-
-                    MessageBox.Show($"Ocorreu um erro no processo de criação do objeto 'Book'\nERRO:{ex.Message}", "Error - Deserialização json", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return null;
-                }
+                throw new ArgumentException("Índices inválidos");
             }
-            else
-            {
-                MessageBox.Show("Não foi possível construir o objeto 'Book'", "Erro - Object", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return null;
-            }
+
+            original = original.Remove(startIndex, length).Insert(startIndex, substitute);
         }
 
         /// <summary>
         ///         <br><b>** Método de controle interno **</b></br>
         ///         <br>Este método tenta preencher o objeto do tipo <b>Book</b> que terá as informações do livro</br>
         /// </summary>
-        /// <param name="Tags">Recebe uma coleção com as <b><i>Tags</i></b> que serão verificadas para preencher o objeto <b>Book</b></param>
         /// <param name="JSON">Recebe a string com o conteúdo completo do <c><b><i>*.json</i></b></c> que contém as informações do ISBN-XX</param>
+        /// <param name="Deslocation">Deslocamento do json para substituir raiz</param>
         /// <returns>Retorna um objeto do tipo <b>Book</b></returns>
 
-        private static Book TryCreateObject(List<string> Tags, string JSON)
+        private static Book TryCreateObject(string JSON, int Deslocation)
         {
-            Book book = new Book();
-            string[] Argumentos = JSON.Split('|');
-            foreach (string Tag in Tags)
-            {
-                foreach (string Argument in Argumentos)
-                {
-                    if (Argument.Contains($"'{Tag}':"))
-                    {
-                        string Formated = Argument.Trim();
-                        if (Tag == "title")
-                            book.Title = Validacoes.FullFormat(@GetAttribute(Formated));
-                        else if (Tag == "isbn_10")
-                            book.ISBN10 = GetAttribute(Formated);
-                        else if (Tag == "isbn_13")
-                            book.ISBN13 = GetAttribute(Formated);
-                        else if (Tag == "publish_date")
-                            book.Publish_Date = GetAttribute(Formated);
-                        else if (Tag == "source_records")
-                            book.Source_Records = GetAttribute(Formated);
-                        else if (Tag == "publishers")
-                            book.Publishers = Validacoes.FullFormat(GetAttribute(Formated));
-                        else if (Tag == "physical_format")
-                            book.Physical_Format = GetAttribute(Formated);
-                        else if (Tag == "authors")
-                            GetAuthor(ref book, Argument.Substring(Argument.IndexOf("/")).Replace("]", "").Replace("}", "").Replace("'", ""));
-                    }
-                }
-            }
+            ReplaceSubstring(ref JSON, 2, Deslocation, "Generic");
+            var obj = JsonConvert.DeserializeObject<Rootobject>(JSON);
 
-            return book;
+            Parser parser = Parser.Instance();
+            parser.Parse(obj);
+            return parser.Parse(obj);
         }
 
         /// <summary>
-        ///         <br><b>** Método de controle interno **</b></br>
-        ///         <br>Este método tenta recuperar o <b>Autor</b> do livro no servidor online</br>
-        /// </summary>
-        /// <param name="book">Recebe a referência da variável em memória com o objeto criado do tipo <b>Book</b></param>
-        /// <param name="reference">Recebe o <b>src</b> com o caminho para acessar os arquivos do Autor no servidor</param>
-
-        private static void GetAuthor(ref Book book, string reference)
-        {
-            try
-            {
-                using (WebClient Client = new WebClient())
-                {
-                    string source = $"https://openlibrary.org{reference}.json";
-                    string Content = Client.DownloadString(source).Replace("\"", "'").Replace("',", "'|").Replace("],", "]|").Replace("},", "}|");
-                    string[] Argumentos = Content.Split('|');
-                    foreach (string Argument in Argumentos)
-                        if (Argument.Contains($"'name':"))
-                            book.Author = Validacoes.FullFormat(GetAttribute(Argument));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ocorreu um erro no processo de criação do objeto 'Book'\nERRO:{ex.Message}", "Error - Deserialização json", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary>
-        /// Format an isbn code (10 to 13 or 13 to 10)
+        /// Format an isbn code (ISBN10 to ISBN13 or ISBN13 to ISBN10)
         /// </summary>
         /// <param name="ISBN">ISBN10 or ISBN13</param>
         /// <returns>Converted ISBN</returns>
 
         public static string FormatISBN(string ISBN)
         {
-            string Formated = ISBN.Replace(".", "").Replace("-", "").Replace(" ", "");
-            if (Formated.Length == 10)
+            FormatISBN(ref ISBN);
+            if (ISBN.Length == 10)
             {
                 int Soma = 0, fator = 1, digito = 0;
                 int[] Valores = new int[12];
@@ -323,7 +255,7 @@ namespace ISBNQuery
 
                 for (int i = 3; i < 12; i++)
                 {
-                    Valores[i] = int.Parse(Convert.ToString(Formated[i - 3]));
+                    Valores[i] = int.Parse(Convert.ToString(ISBN[i - 3]));
                 }
 
                 for (int i = 0; i < 12; i++)
@@ -338,14 +270,14 @@ namespace ISBNQuery
                 int mod = Soma % 10;
                 if (mod != 0) { digito = 10 - mod; }
 
-                return String.Format("978{0}{1}", Formated.Substring(0, 9), digito);
+                return String.Format("978{0}{1}", ISBN.Substring(0, 9), digito);
             }
-            else if (Formated.Length == 13)
+            else if (ISBN.Length == 13)
             {
                 int[] Valores = new int[9];
                 for (int i = 3; i < 12; i++)
                 {
-                    Valores[i - 3] = int.Parse(Formated[i].ToString());
+                    Valores[i - 3] = int.Parse(ISBN[i].ToString());
                 }
 
                 int Soma = 0, fator = 10;
@@ -366,8 +298,7 @@ namespace ISBNQuery
             }
             else
             {
-                MessageBox.Show("ISBN code wrong", "ISBN Check", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return null;
+                throw new FormatExceptionArgument("ISBN code wrong", new Exception(), ReturnType.InvalidInputFormat);
             }
         }
 
@@ -377,7 +308,7 @@ namespace ISBNQuery
         /// <param name="Size">Tamanho da imagem disponível pela API</param>
         /// <param name="KEY">Chave de busca $ISBN</param>
         /// <returns>Retorna a imagem no formato ByteArray[]</returns>
-
+        [Obsolete("Change to new method constructor using Book object")]
         public static byte[] GetImage(ImageSize Size, string KEY)
         {
             string MASK = $"https://covers.openlibrary.org/b/isbn/{KEY}-{(char)Size}.jpg";
@@ -400,6 +331,39 @@ namespace ISBNQuery
             {
                 throw e;
             }
+        }
+
+        /// <summary>
+        /// Obtém a capa do livro solicitado
+        /// </summary>
+        /// <param name="Size">Tamanho da imagem disponível pela API</param>
+        /// <param name="Book">Objeto book que será usado para validar a existência de uma capa disponível pela API</param>
+        /// <returns></returns>
+        /// <exception cref="Erros.BookException"></exception>
+
+        public static byte[] GetImage(ImageSize Size, Book @Book)
+        {
+            string MASK = $"https://covers.openlibrary.org/b/isbn/{(string.IsNullOrWhiteSpace(Book.ISBN13) ? Book.ISBN10 : Book.ISBN13)}-{(char)Size}.jpg";
+            byte[] IMAGE = null;
+
+            if (Book.HasCover)
+            {
+                try
+                {
+                    using (WebClient Cliente = new WebClient())
+                    {
+                        IMAGE = Cliente.DownloadData(MASK);
+                    }
+
+                    return IMAGE; //Image found
+                }
+                catch (Exception e)
+                {
+                    throw new BookException("Generic error while getting cover", e);
+                }
+            }
+            else
+                throw new BookException("Cover unvaible");
         }
 
         /// <summary>
@@ -431,31 +395,34 @@ namespace ISBNQuery
         /// Obtém diretamente a imagem, executando as rotidas já existentes individuais
         /// </summary>
         /// <param name="Size">Tamanho da imagem disponibilizada pela API</param>
-        /// <param name="KEY">Chave de consulta $ISBN</param>
+        /// <param name="Key">chave de consulta $ISBN</param>
         /// <returns>Imagem do $KEY passado no tamanho $SIZE</returns>
-
-        public static Image GetCompostImage(ImageSize Size, string KEY)
+        [Obsolete("Change to new method constructor using Book object")]
+        public static Image GetCompostImage(ImageSize Size, string Key)
         {
-            var bytes = GetImage(Size, KEY);
-            if(bytes.Length == 0)         
-                return null;          
+            var bytes = GetImage(Size, Key);
+            if (bytes.Length == 0)
+                return null;
 
             return GetImageFromByteArray(bytes);
         }
 
         /// <summary>
-        ///         <br><b>** Método de controle interno **</b></br>
-        ///         <br>Este método recupera a informação associada a uma <b>Tag</b> no arquivo JSON</br>
+        /// Obtém diretamente a imagem, executando as rotidas já existentes individuais
         /// </summary>
-        /// <param name="Sequo">Recebe a string com a tag e seu argumento</param>
-        /// <returns>Devolve uma string com o argumento associado à tag</returns>
+        /// <param name="Size">Tamanho da imagem disponibilizada pela API</param>
+        /// <param name="book">Objeto book associado para a consulta</param>
+        /// <returns>Imagem do $KEY passado no tamanho $SIZE</returns>
 
-        private static string GetAttribute(string Sequo)
+        public static Image GetCompostImage(ImageSize Size, Book book)
         {
-            string Formated = Sequo.Trim().Replace("[", "").Replace("]", "");
-            Formated = Formated.Substring(Formated.IndexOf(':') + 0x2).Replace("'", "").Trim();
-            return Formated;
+            var bytes = GetImage(Size, book);
+            if (bytes.Length == 0)
+                return null;
+
+            return GetImageFromByteArray(bytes);
         }
+
 
         /// <summary>
         /// Tamanhos disponíveis da imagem

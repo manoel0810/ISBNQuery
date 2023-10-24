@@ -30,6 +30,8 @@ namespace InterfaceTeste
             Console.WriteLine($"ISBN10......: {book.ISBN10}");
             Console.WriteLine($"ISBN13......: {book.ISBN13}");
             Console.WriteLine($"Publish Date: {book.Publish_Date}");
+            Console.WriteLine($"Cover Avai..: {book.HasCover}");
+            Console.WriteLine($"Pag. Count..: {book.NumberOfPages}");
             Console.WriteLine("\n---------------------------------------- ***** ----------------------------------------");
             Console.ForegroundColor = ConsoleColor.White;
             return;
@@ -71,6 +73,7 @@ namespace InterfaceTeste
                 Console.WriteLine(" /comp: Verifica se dois inputs são iguais <arg1> == <arg2> ? ");
                 Console.WriteLine(" /img:  Obtém a imagem associado a um ISBN. Requer -Ss <s, m, l> e -K <isbn>");
                 Console.WriteLine(" /help: Exibe esta ajuda de opções");
+                Console.WriteLine(" v{0}", Consultas.GetCallingAssemblyVersion());
                 Console.WriteLine("\n---------------------------------------- ***** ----------------------------------------");
                 return;
             }
@@ -151,18 +154,19 @@ namespace InterfaceTeste
                     {
                         //System.Drawing.Image IMG = null;
                         byte[] Bytes = new byte[] { };
+                        Book book = Consultas.ConsultarISBN(KEY, true);
                         switch (Op)
                         {
                             case 'S':
-                                Bytes = Consultas.GetImage(Consultas.ImageSize.S, KEY);
+                                Bytes = Consultas.GetImage(Consultas.ImageSize.S, book);
                                 //IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'M':
-                                Bytes = Consultas.GetImage(Consultas.ImageSize.M, KEY);
+                                Bytes = Consultas.GetImage(Consultas.ImageSize.M, book);
                                 //var IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'L':
-                                Bytes = Consultas.GetImage(Consultas.ImageSize.L, KEY);
+                                Bytes = Consultas.GetImage(Consultas.ImageSize.L, book);
                                 //IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                         }
