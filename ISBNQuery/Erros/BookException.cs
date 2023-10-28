@@ -13,7 +13,7 @@ namespace ISBNQuery.Erros
         /// <param name="message">Nice message</param>
         public BookException(string message) : base(message)
         {
-
+            //TODO: Implement necessary fields (if necessary)
         }
 
         /// <summary> 
@@ -24,7 +24,7 @@ namespace ISBNQuery.Erros
 
         public BookException(string message, Exception innerException) : base(message, innerException)
         {
-
+            //TODO: Implement necessary fields (if necessary)
         }
     }
 }

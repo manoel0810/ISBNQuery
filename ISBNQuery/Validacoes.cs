@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.Net.NetworkInformation;
-using System.Windows.Forms;
 
 namespace ISBNQuery
 {
@@ -115,12 +114,10 @@ namespace ISBNQuery
 
             if (string.IsNullOrEmpty(ISBN13))
             {
-                MessageBox.Show("O argumento [ISBN13] não pode ser nulo", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return ReturnType.NullArgumentException;
             }
             else if (ISBN13.Length != 0xd /*13DEC*/)
             {
-                MessageBox.Show("O argumento [ISBN13] deve ter tamanho fixo igual a 13 (treze)", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return ReturnType.ISBN13LenghtError;
             }
 
@@ -152,12 +149,10 @@ namespace ISBNQuery
 
             if (string.IsNullOrEmpty(ISBN10))
             {
-                MessageBox.Show("O argumento [ISBN10] não pode ser nulo", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return ReturnType.NullArgumentException;
             }
             else if (ISBN10.Length != 0xa /*10DEC*/)
             {
-                MessageBox.Show("O argumento [ISBN10] deve ter tamanho fixo igual a 10 (dez)", "Argumento inválido", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return ReturnType.ISBN10LenghtError;
             }
 

@@ -108,15 +108,10 @@ namespace ISBNQuery
         public static Book ConsultarISBN13(string ISBN13, bool InternetCheck)
         {
             FormatISBN(ref ISBN13);
-            if (InternetCheck)
-                if (!Validacoes.CheckInternet())
-                {
-                    throw new InternetException("No internet access detected", new Exception());
-                }
-                else
-                    return ConsultarISBN13(ISBN13);
-            else
-                return ConsultarISBN13(ISBN13);
+            if (InternetCheck && !Validacoes.CheckInternet())
+                throw new InternetException("No internet access detected", new Exception());
+
+            return ConsultarISBN13(ISBN13);
         }
 
         /// <summary>
@@ -163,15 +158,10 @@ namespace ISBNQuery
         public static Book ConsultarISBN10(string ISBN10, bool InternetCheck)
         {
             FormatISBN(ref ISBN10);
-            if (InternetCheck)
-                if (!Validacoes.CheckInternet())
-                {
-                    throw new InternetException("No internet access detected", new Exception());
-                }
-                else
-                    return ConsultarISBN10(ISBN10);
-            else
-                return ConsultarISBN10(ISBN10);
+            if (InternetCheck && !Validacoes.CheckInternet())
+                throw new InternetException("No internet access detected", new Exception());
+
+            return ConsultarISBN10(ISBN10);
         }
 
         /// <summary>
@@ -187,11 +177,9 @@ namespace ISBNQuery
         {
             FormatISBN(ref ISBN10);
             if (!Validacoes.CheckInternet(Url, Timeout))
-            {
                 throw new InternetException("No internet access detected", new Exception());
-            }
-            else
-                return ConsultarISBN10(ISBN10);
+
+            return ConsultarISBN10(ISBN10);
         }
 
         /// <summary>

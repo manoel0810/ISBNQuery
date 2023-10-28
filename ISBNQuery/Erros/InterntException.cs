@@ -14,7 +14,7 @@ namespace ISBNQuery.Erros
         /// <param name="innerException">Stack of previous error</param>
         public InternetException(string message, Exception innerException) : base(message, innerException)
         {
-
+            //TODO: Implement necessary fields (if necessary)
         }
     }
 
@@ -30,7 +30,7 @@ namespace ISBNQuery.Erros
         /// <param name="innerException">Stack of previous error</param>
         public InternetException404(string message, Exception innerException) : base(message, innerException)
         {
-
+            //TODO: Implement necessary fields (if necessary)
         }
     }
 }

@@ -155,6 +155,13 @@ namespace InterfaceTeste
                         //System.Drawing.Image IMG = null;
                         byte[] Bytes = new byte[] { };
                         Book book = Consultas.ConsultarISBN(KEY, true);
+                        if(book.HasCover == false)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"Cover unvaible for {KEY}");
+                            Console.ForegroundColor = ConsoleColor.White;
+                            return;
+                        }
                         switch (Op)
                         {
                             case 'S':
@@ -184,6 +191,7 @@ namespace InterfaceTeste
 
                             File.WriteAllBytes(PATH, Bytes);
                             Console.WriteLine("A imagem foi salva no diretório do programa");
+                            System.Diagnostics.Process.Start(PATH);
                             return;
                         }
                         catch (Exception e)
@@ -216,11 +224,18 @@ namespace InterfaceTeste
                 return;
             }
 
-            Book book = Consultas.ConsultarISBN10(Args, true);
-            if (book != null)
-                ShowBook(book);
-            else
-                Console.WriteLine($"Não foi possível recuparar os dados para o seguinte ISBN: {Args}");
+            try
+            {
+                Book book = Consultas.ConsultarISBN10(Args, true);
+                if (book != null)
+                    ShowBook(book);
+                else
+                    Console.WriteLine($"Não foi possível recuparar os dados para o seguinte ISBN: {Args}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERRO: {e.Message}");
+            }
 
             return;
         }
@@ -235,11 +250,18 @@ namespace InterfaceTeste
                 return;
             }
 
-            Book book = Consultas.ConsultarISBN13(Args, true);
-            if (book != null)
-                ShowBook(book);
-            else
-                Console.WriteLine($"Não foi possível recuparar os dados para o seguinte ISBN: {Args}");
+            try
+            {
+                Book book = Consultas.ConsultarISBN13(Args, true);
+                if (book != null)
+                    ShowBook(book);
+                else
+                    Console.WriteLine($"Não foi possível recuparar os dados para o seguinte ISBN: {Args}");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERRO: {e.Message}");
+            }
 
             return;
         }

@@ -13,6 +13,8 @@ namespace ISBNQuery
     [Serializable]
     internal class Generic
     {
+        //TODO: manipulate arrays so that json returns with more than one list component can be accessed by indexing
+
         private readonly Dictionary<string, Func<Generic, string>> Access = new Dictionary<string, Func<Generic, string>>()
         {
             { "bib_key", (obj) => obj.BibKey },
