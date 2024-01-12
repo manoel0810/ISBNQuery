@@ -10,7 +10,7 @@ namespace ISBNQuery
     ///     Esta classe fornece métodos para verificar a validade dos códigos <b>ISBN-10</b> e <b>ISBN-13</b> e formatações <c>UTF-8</c>
     /// </summary>
 
-    internal class Validacoes
+    public class Validacoes
     {
         private static readonly Dictionary<string, string> Acentos = new Dictionary<string, string>
         {
@@ -25,6 +25,17 @@ namespace ISBNQuery
             {@"\u00c3", "Ã" },  {@"\u00ec", "ì" },    {@"\u00f5", "õ"},    {@"\u00fc", "ü"},
             {@"\u00c4", "Ä" },  {@"\u00ee", "î" },    {@"\u00f6", "ö"},    {@"\u00da", "Ú"},
         };
+
+#if DEBUG
+
+        /// <summary>
+        /// Retorna a lista interna de acentos do controle
+        /// </summary>
+        /// <returns></returns>
+
+        public static IReadOnlyDictionary<string, string> GetInternalDictionary() => Acentos;
+
+#endif
 
         /// <summary>
         /// Obtém o unicode de união de um caractere
@@ -84,11 +95,17 @@ namespace ISBNQuery
         /// Verifica a conexão com a internet
         /// </summary>
         /// <param name="URL">Url para ping-test</param>
-        /// <param name="Timeout">Tempo de aguado para resposta</param>
+        /// <param name="Timeout">Tempo de aguado para resposta, compreendendo um intervalo de [1500 ~ 10000ms]</param>
         /// <returns><i>true</i> se a conexão ocorrer bem</returns>
 
         public static bool CheckInternet(string URL = "www.google.com", int Timeout = 3000)
         {
+            if (string.IsNullOrEmpty(URL))
+                throw new ArgumentNullException(nameof(URL), "The 'Url' cannot be null or empty");
+
+            if (Timeout < 1500 || Timeout > 10000)
+                throw new Exception("The timeout value must be between 1500 ~ 10000ms");
+
             Ping ping = new Ping();
             try
             {
@@ -109,17 +126,14 @@ namespace ISBNQuery
 
         public static ReturnType CheckISBN13(string ISBN13)
         {
+            if (string.IsNullOrEmpty(ISBN13))
+                return ReturnType.NullArgumentException;
+
             if (!Numeric(ISBN13))
                 return ReturnType.InvalidInputFormat;
 
-            if (string.IsNullOrEmpty(ISBN13))
-            {
-                return ReturnType.NullArgumentException;
-            }
-            else if (ISBN13.Length != 0xd /*13DEC*/)
-            {
+            if (ISBN13.Length != 0xd /*13DEC*/)
                 return ReturnType.ISBN13LenghtError;
-            }
 
             int[] Produtos = new int[0xc], ISBN = new int[0xd];
             for (int Position = 0x0; Position < ISBN.Length; Position++)
@@ -144,17 +158,14 @@ namespace ISBNQuery
 
         public static ReturnType CheckISBN10(string ISBN10)
         {
+            if (string.IsNullOrEmpty(ISBN10))
+                return ReturnType.NullArgumentException;
+
             if (!Numeric(ISBN10, true))
                 return ReturnType.InvalidInputFormat;
 
-            if (string.IsNullOrEmpty(ISBN10))
-            {
-                return ReturnType.NullArgumentException;
-            }
-            else if (ISBN10.Length != 0xa /*10DEC*/)
-            {
-                return ReturnType.ISBN10LenghtError;
-            }
+            if (ISBN10.Length != 0xa /*10DEC*/)
+                return ReturnType.ISBN10LenghtError;       
 
             int[] Produtos = new int[0x9], ISBN = new int[0xa];
             for (int Position = 0x0; Position < ISBN.Length; Position++)
