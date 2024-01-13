@@ -9,15 +9,15 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Obtém informações de um ISBN online")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Tech™, Inc.")]
-[assembly: AssemblyProduct("ISBNQuery")]
+[assembly: AssemblyProduct("ISBN Query")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
-[assembly: AssemblyTrademark("Biblioteca Fácil")]
+[assembly: AssemblyTrademark("EasyLi")]
 [assembly: AssemblyCulture("")]
 
 // Definir ComVisible como false torna os tipos neste assembly invisíveis
 // para componentes COM. Caso precise acessar um tipo neste assembly de
 // COM, defina o atributo ComVisible como true nesse tipo.
-[assembly: ComVisible(true)]
+[assembly: ComVisible(false)]
 
 // O GUID a seguir será destinado à ID de typelib se este projeto for exposto para COM
 [assembly: Guid("e9d181d1-d6a7-40b8-8c08-29c05f963351")]
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 // usando o "*" como mostrado abaixo:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.4.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
 [assembly: NeutralResourcesLanguage("pt-BR")]

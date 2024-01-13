@@ -35,7 +35,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Tech_Key.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -57,18 +58,29 @@
   <ItemGroup>
     <Compile Include="APIResult.cs" />
     <Compile Include="Book.cs" />
-    <Compile Include="Consultas.cs" />
+    <Compile Include="Enumns.cs" />
+    <Compile Include="Interface\IISBNQuery.cs" />
+    <Compile Include="ISBNParser.cs" />
+    <Compile Include="ISBNSearch\ISBN10.cs" />
+    <Compile Include="ISBNSearch\ISBN13.cs" />
+    <Compile Include="Query.cs" />
     <Compile Include="Erros\ApiRequestJsonError.cs" />
     <Compile Include="Erros\BookException.cs" />
     <Compile Include="Erros\FormatException.cs" />
     <Compile Include="Erros\InterntException.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Validacoes.cs" />
+    <Compile Include="Shared\CoverSearch.cs" />
+    <Compile Include="Shared\DataDownload.cs" />
+    <Compile Include="Shared\ImageProcessor.cs" />
+    <Compile Include="Shared\Internet.cs" />
+    <Compile Include="Shared\MathHelp.cs" />
+    <Compile Include="Shared\StringValidate.cs" />
+    <Compile Include="Shared\WindowsHelp.cs" />
+    <Compile Include="Shared\StringHelp.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Tech_Key.pfx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

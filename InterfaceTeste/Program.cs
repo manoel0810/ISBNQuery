@@ -73,7 +73,7 @@ namespace InterfaceTeste
                 Console.WriteLine(" /comp: Verifica se dois inputs são iguais <arg1> == <arg2> ? ");
                 Console.WriteLine(" /img:  Obtém a imagem associado a um ISBN. Requer -Ss <s, m, l> e -K <isbn>");
                 Console.WriteLine(" /help: Exibe esta ajuda de opções");
-                Console.WriteLine(" v{0}", Consultas.GetCallingAssemblyVersion());
+                Console.WriteLine(" v{0}", Query.GetCallingAssemblyVersion());
                 Console.WriteLine("\n---------------------------------------- ***** ----------------------------------------");
                 return;
             }
@@ -154,7 +154,7 @@ namespace InterfaceTeste
                     {
                         //System.Drawing.Image IMG = null;
                         byte[] Bytes = new byte[] { };
-                        Book book = Consultas.ConsultarISBN(KEY, true);
+                        Book book = Query.ConsultarISBN(KEY, true);
                         if(book.HasCover == false)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
@@ -165,15 +165,15 @@ namespace InterfaceTeste
                         switch (Op)
                         {
                             case 'S':
-                                Bytes = Consultas.GetImage(Consultas.ImageSize.S, book);
+                                Bytes = Query.GetImage(Query.ImageSize.S, book);
                                 //IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'M':
-                                Bytes = Consultas.GetImage(Consultas.ImageSize.M, book);
+                                Bytes = Query.GetImage(Query.ImageSize.M, book);
                                 //var IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'L':
-                                Bytes = Consultas.GetImage(Consultas.ImageSize.L, book);
+                                Bytes = Query.GetImage(Query.ImageSize.L, book);
                                 //IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                         }
@@ -226,7 +226,7 @@ namespace InterfaceTeste
 
             try
             {
-                Book book = Consultas.ConsultarISBN10(Args, true);
+                Book book = Query.ConsultarISBN10(Args, true);
                 if (book != null)
                     ShowBook(book);
                 else
@@ -252,7 +252,7 @@ namespace InterfaceTeste
 
             try
             {
-                Book book = Consultas.ConsultarISBN13(Args, true);
+                Book book = Query.ConsultarISBN13(Args, true);
                 if (book != null)
                     ShowBook(book);
                 else
@@ -268,7 +268,7 @@ namespace InterfaceTeste
 
         private static void ConverteISBN(string Args)
         {
-            string Convertido = Consultas.FormatISBN(Args);
+            string Convertido = Query.FormatISBN(Args);
             string Tipo = Convertido.Length.Equals(10) ? "ISBN13" : "ISBN10";
             Signal("return");
 

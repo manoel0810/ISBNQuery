@@ -1,21 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace ISBNQuery
 {
     internal class Parser
     {
-        private static Parser _instance;
-        private Parser() { }
-
-        public static Parser Instance()
-        {
-            if (_instance == null)
-                _instance = new Parser();
-
-            return _instance;
-        }
-
-        public Book Parse(Rootobject @object)
+        public static Book Parse(Rootobject @object)
         {
             Book book = new Book();
             string[] rootValues = { "bib_key", "info_url", "thumbnail_url" };
@@ -33,6 +24,23 @@ namespace ISBNQuery
             book.SetPropertie(new KeyValuePair<string, string>("publishers", @object.Generic.Details.Publishers != null && @object.Generic.Details.Publishers.Length > 0 ? @object.Generic.Details.Publishers[0] : ""));
 
             return book;
+        }
+
+        static void ReplaceSubstring(ref string original, int startIndex, int length, string substitute)
+        {
+            if (startIndex < 0 || startIndex >= original.Length || length < 0 || startIndex + length > original.Length)
+            {
+                throw new ArgumentException("Índices inválidos");
+            }
+
+            original = original.Remove(startIndex, length).Insert(startIndex, substitute);
+        }
+
+        public static Book TryCreateObject(string JSON, int Deslocation)
+        {
+            ReplaceSubstring(ref JSON, 2, Deslocation, "Generic");
+            var obj = JsonConvert.DeserializeObject<Rootobject>(JSON);
+            return Parse(obj);
         }
     }
 
