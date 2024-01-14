@@ -2,6 +2,7 @@
 using ISBNQuery.Interface;
 using ISBNQuery.Shared;
 using System;
+using System.Threading.Tasks;
 
 namespace ISBNQuery.ISBNSearch
 {
@@ -35,11 +36,11 @@ namespace ISBNQuery.ISBNSearch
         /// <returns>Um objeto <see cref="Book"/> com os dados disponíveis na API da Open Libary</returns>
         /// <exception cref="BookException"></exception>
 
-        public Book SearchBook(string isbn)
+        public async Task<Book> SearchBook(string isbn)
         {
             try
             {
-                return BookSearch.Search(this, isbn);
+                return await BookSearch.Search(this, isbn);
             }
             catch (Exception ex)
             {

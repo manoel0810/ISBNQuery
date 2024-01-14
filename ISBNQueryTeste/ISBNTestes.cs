@@ -3,6 +3,7 @@ using ISBNQuery.Erros;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace ISBNQueryTeste
 {
@@ -16,10 +17,10 @@ namespace ISBNQueryTeste
         }
 
         [TestMethod]
-        public void ISBN10Search()
+        public async Task ISBN10SearchAsync()
         {
-            Assert.IsTrue(Query.SearchBook("8551005197") != null);
-            Assert.IsTrue(Query.SearchBook("658021001X") != null);
+            Assert.IsTrue(await Query.SearchBook("8551005197") != null);
+            Assert.IsTrue(await Query.SearchBook("658021001X") != null);
         }
 
         [TestMethod]
@@ -35,13 +36,13 @@ namespace ISBNQueryTeste
         }
 
         [TestMethod]
-        public void SearchCover()
+        public async Task SearchCoverAsync()
         {
-            Book book = Query.SearchBook("8551005197");
-            Assert.IsInstanceOfType(Query.SearchCover(book, ImageSize.L), typeof(Image));
+            Book book = await Query.SearchBook("8551005197");
+            Assert.IsInstanceOfType(Query.SearchCover(book, ImageSize.L), typeof(Task<Image>));
 
-            Assert.ThrowsException<ArgumentNullException>(() => { Query.SearchCover(null, ImageSize.L); });
-            Assert.ThrowsException<BookException>(() => { Query.SearchCover(new Book(), ImageSize.L); });
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => { await Query.SearchCover(null, ImageSize.L); });
+            await Assert.ThrowsExceptionAsync<BookException>(async () => { await Query.SearchCover(new Book(), ImageSize.L); });
         }
     }
 }

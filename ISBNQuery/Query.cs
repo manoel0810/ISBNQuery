@@ -4,6 +4,7 @@ using ISBNQuery.ISBNSearch;
 using ISBNQuery.Shared;
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace ISBNQuery
 {
@@ -23,7 +24,7 @@ namespace ISBNQuery
         /// <exception cref="BookException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
 
-        public static Book SearchBook(string isbn)
+        public static async Task<Book> SearchBook(string isbn)
         {
             if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentNullException(nameof(isbn));
@@ -34,7 +35,7 @@ namespace ISBNQuery
 
             IISBNQuery query = QueriableObject(temp);
             if (query.IsValid(temp) && query.ValidateISBN(temp) == query.ExpectedSuccessCode())
-                return query.SearchBook(temp);
+                return await query.SearchBook(temp);
 
             throw new BookException("error while trying to obtain and/or create book object");
         }
@@ -54,7 +55,7 @@ namespace ISBNQuery
         /// <exception cref="BookException"></exception>
         /// <exception cref="Exception"></exception>
 
-        public static Image SearchCover(Book book, ImageSize size)
+        public static async Task<Image> SearchCover(Book book, ImageSize size)
         {
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
@@ -64,7 +65,7 @@ namespace ISBNQuery
 
             try
             {
-                Image cover = CoverSearch.GetCompostImage(size, book);
+                Image cover = await CoverSearch.GetCompostImage(size, book);
                 return cover;
             }
             catch (Exception e)

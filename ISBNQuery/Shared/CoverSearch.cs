@@ -1,6 +1,7 @@
 ﻿using ISBNQuery.Erros;
 using System;
 using System.Drawing;
+using System.Threading.Tasks;
 
 namespace ISBNQuery.Shared
 {
@@ -17,7 +18,7 @@ namespace ISBNQuery.Shared
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="BookException"></exception>
 
-        public static Image GetCompostImage(ImageSize size, Book book)
+        public static async Task<Image> GetCompostImage(ImageSize size, Book book)
         {
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
@@ -26,7 +27,7 @@ namespace ISBNQuery.Shared
             {
                 try
                 {
-                    byte[] imageBytes = GetImageBytes((string.IsNullOrWhiteSpace(book.ISBN13) ? book.ISBN10 : book.ISBN13), size);
+                    byte[] imageBytes = await GetImageBytes((string.IsNullOrWhiteSpace(book.ISBN13) ? book.ISBN10 : book.ISBN13), size);
                     Image image = ImageProcessor.GetImageFromByteArray(imageBytes);
                     return image;
                 }
@@ -39,10 +40,10 @@ namespace ISBNQuery.Shared
             throw new BookException("Cover unvaible");
         }
 
-        private static byte[] GetImageBytes(string key, ImageSize size)
+        private static async Task<byte[]> GetImageBytes(string key, ImageSize size)
         {
             string endPoint = string.Format("{0}{1}-{2}.jpg", _apiRoute, key, ((char)size).ToString());
-            return DataDownload.DownloadAsyncData(endPoint).Result;
+            return await DataDownload.DownloadAsyncData(endPoint);
         }
     }
 }
