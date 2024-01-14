@@ -25,11 +25,11 @@ namespace ISBNQuery
 
         public static Book SearchBook(string isbn)
         {
-            if(string.IsNullOrWhiteSpace(isbn))
+            if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentNullException(nameof(isbn));
 
             string temp = StringValidate.RemoveUnwantedCases(isbn);
-            if (temp.Length > 13 || temp.Length < 10 || !StringValidate.IsNumeric(temp, true))
+            if (IsWrongLenght(temp) || !StringValidate.IsNumeric(temp, true))
                 throw new Exception("isbn code wrong");
 
             IISBNQuery query = QueriableObject(temp);
@@ -37,6 +37,11 @@ namespace ISBNQuery
                 return query.SearchBook(temp);
 
             throw new BookException("error while trying to obtain and/or create book object");
+        }
+
+        private static bool IsWrongLenght(string code)
+        {
+            return (code.Length > 13 || code.Length < 10);
         }
 
         /// <summary>

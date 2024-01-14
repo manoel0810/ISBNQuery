@@ -2,7 +2,6 @@
 using ISBNQuery.Interface;
 using ISBNQuery.Shared;
 using System;
-using System.Drawing;
 
 namespace ISBNQuery.ISBNSearch
 {
@@ -17,24 +16,6 @@ namespace ISBNQuery.ISBNSearch
         /// </summary>
         /// <returns></returns>
         public ReturnType ExpectedSuccessCode() => ReturnType.ValidISBN10;
-
-        /// <summary>
-        /// Obtém a capa do exemplar no objeto <see cref="Image"/>, caso exista
-        /// </summary>
-        /// <param name="book">Objeto <see cref="Book"/> com as informações do exemplar que se deseja obter a capa</param>
-        /// <param name="size">Define o tamanho da imagem, com base nas opções disponíveis por <see cref="ImageSize"/></param>
-        /// <returns>Um <see cref="Image"/> com a capa, caso exista</returns>
-        /// <exception cref="NotImplementedException"></exception>
-
-        public Image GetBookCover(Book book, ImageSize size)
-        {
-            if (book == null)
-                throw new ArgumentNullException(nameof(book));
-            else if (book.HasCover == false)
-                throw new BookException($"no cover avaible for '{book.ISBN10}' code");
-
-            return CoverSearch.GetCompostImage(size, book);
-        }
 
         /// <summary>
         /// Verifica está no formato válido
@@ -52,31 +33,19 @@ namespace ISBNQuery.ISBNSearch
         /// </summary>
         /// <param name="isbn">Código ISBN para consulta</param>
         /// <returns>Um objeto <see cref="Book"/> com os dados disponíveis na API da Open Libary</returns>
-        /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="BookException"></exception>
 
         public Book SearchBook(string isbn)
         {
-            if (string.IsNullOrWhiteSpace(isbn))
-                throw new ArgumentNullException(nameof(isbn));
-
-            string temp = StringValidate.RemoveUnwantedCases(isbn);
-            if (IsValid(temp) && ValidateISBN(temp) == ExpectedSuccessCode())
+            try
             {
-                try
-                {
-                    Book book = DataDownload.DownloadBookDataAsync(temp).Result;
-                    return book;
-                }
-                catch (Exception e)
-                {
-                    throw new BookException("there was some error while book data download", e);
-                }
+                return BookSearch.Search(this, isbn);
             }
-            else
-                throw new BookException($"invalid isbn-10 code. value is {isbn}");
+            catch (Exception ex)
+            {
+                throw new BookException("error while book search", ex);
+            }
         }
-
         /// <summary>
         /// Verifica se um código ISBN é válido e está com o dígito de verificação correto
         /// </summary>

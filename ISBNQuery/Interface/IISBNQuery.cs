@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace ISBNQuery.Interface
+﻿namespace ISBNQuery.Interface
 {
     internal interface IISBNQuery
     {
@@ -8,6 +6,5 @@ namespace ISBNQuery.Interface
         Book SearchBook(string isbn);
         ReturnType ExpectedSuccessCode();
         ReturnType ValidateISBN(string isbn);
-        Image GetBookCover(Book book, ImageSize size);
     }
 }

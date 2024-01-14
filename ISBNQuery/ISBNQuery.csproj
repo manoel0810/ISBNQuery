@@ -61,6 +61,7 @@
     <Compile Include="Enumns.cs" />
     <Compile Include="Interface\IISBNQuery.cs" />
     <Compile Include="ISBNParser.cs" />
+    <Compile Include="ISBNSearch\BookSearch.cs" />
     <Compile Include="ISBNSearch\ISBN10.cs" />
     <Compile Include="ISBNSearch\ISBN13.cs" />
     <Compile Include="Query.cs" />
