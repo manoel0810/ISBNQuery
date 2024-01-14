@@ -10,74 +10,36 @@ Guia prático de uso da dll ISBNQuery para consultas online do ISBN de livros e 
 ## Créditos:
 A dll ISBNQuery faz consultas online do código ISBN-10 e ISBN-13 a partir da [API](https://openlibrary.org/developers/) disponibilizada pelo site __Open Library__, disponível em: [Open Library](https://openlibrary.org/).
 
-## Exemplos de código:
+
+
+## Consultas:
+#### Abaixo estão descritos os métodos disponíveis para realizar as consultas utilizando a dll __ISBNQuery 2.0__:
+
+Para pesquisar qualquer exemplar pelo seu código ISBN10 ou ISBN13:
 
 ```
-Book book = ConsultarISBN13("978-8551005194");
-//Retorna um objeto do tipo Book com as informações do livro (O Labirinto do Fauno).
+Book book = Query.SearchBook("8551005197");
 ```
 
-```
-Book book = ConsultarISBN13("978-8551005194", true);
-//Varifica a conexão com a internet, caso obtenha êxito, tenta retorna um objeto do tipo Book com as informações do livro (O Labirinto do Fauno).
-```
-```
-Uri.TryParse("www.google.com", UriKind.Absolut, out Uri link);
-//Crio o meu Uri com o endereço que desejo
-
-Book book = ConsultarISBN13("978-8551005194", link);
-//Varifica a conexão com a internet, caso obtenha êxito, tenta retorna um objeto do tipo Book com as informações do livro (O Labirinto do Fauno).
-```
-
-## Para ISBN10
+Neste caso, "8551005197" é um código ISBN, e corresponde ao livro: __O Labirinto do Fauno.__
+Caso você deseje obter a capa do exemplar, a consulta também é simples:
 
 ```
-Book book = ConsultarISBN10("8551005197");
-//Retorna um objeto do tipo Book com as informações do livro (O Labirinto do Fauno).
+Book book = Query.SearchBook("8551005197");
+Image cover = Query.SearchCover(book, ImageSize.L);
 ```
-```
-Book book = ConsultarISBN10("8551005197", true);
-//Varifica a conexão com a internet, caso obtenha êxito, tenta retorna um objeto do tipo Book com as informações do livro (O Labirinto do Fauno).
-```
-```
-Uri.TryParse("www.google.com", UriKind.Absolut, out Uri link);
-//Crio o meu Uri com o endereço que desejo
-
-Book book = ConsultarISBN10("8551005197", link);
-//Varifica a conexão com a internet, caso obtenha êxito, tenta retorna um objeto do tipo Book com as informações do livro (O Labirinto do Fauno).
-```
-
-## Método - CheckISBN13(string ISBN);
-* Verifica por meio de cálculos se o __ISBN13__ é válido ou não.
-> Retorna um __enum__ do tipo __ReturnType__
-
-## Método - CheckISBN10(string ISBN);
-* Verifica por meio de cálculos se o __ISBN10__ é válido ou não.
-> Retorna um __enum__ do tipo __ReturnType__
-
-## Método - FormatUTF8(string sequo);
-* Formata um fluxo de caracteres com acentos em formato _char_ para seu correspondente caractere acentuado.
-
-> Retorna uma string
-
-## Exemplos de código:
+Nesse contexto, `cover` contém a capa associada ao exemplar `book`, quando disponível. Se o desejado for converter um ISBN10 para ISBN13 ou vice versa, podemos usar um método da classe `ISBNParser`:
 
 ```
-string nonformated = "Mem\u00f3rias P\u00f3stumas de Br\u00e1s Cubas";
-string ret = FormatUTF8(nonformated);
+string result = ISBNParser.ParseISBN("658021001X");
+> result == "9786580210015"
 
-// ret terá como retorno > "Memórias Póstumas de Brás Cubas"
+string result2 = ISBNParser.ParseISBN("9786580210015");
+> result2 == "658021001X"
 ```
 
-## Método - FormatUnicodeCaracters(string sequo);
-* Formata um fluxo de caracteres com acentos de combinação em formato _char_ para seu correspondente caractere acentuado.
+Obterve que os códigos são conversíveis entre si, obtendo sempre os valores correspondentes ao seu ISBN10/ISBN13. Métodos auxiliares para formatação de texto unicode, html, etc, podem ser encontrados na classe `StringHelp`, que pertence a namespace `ISBNQuery.Shared`. 
 
-> Retorna uma string
-
-## Método - FormatISBN(string GenericISBN);
-* Formata um _ISBN10_ para _ISBN13_ ou vice-versa
-
-> Retorna o ISBN-XX formatado
 
 ## Objeto __Book__
 ### Este objeto guarda as informações retornadas pela API. É por meio dele que você terá acesso às informações de retorno.
