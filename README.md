@@ -18,15 +18,15 @@ A dll ISBNQuery faz consultas online do código ISBN-10 e ISBN-13 a partir da [A
 Para pesquisar qualquer exemplar pelo seu código ISBN10 ou ISBN13:
 
 ```
-Book book = Query.SearchBook("8551005197");
+Book book = await Query.SearchBook("8551005197");
 ```
 
 Neste caso, "8551005197" é um código ISBN, e corresponde ao livro: __O Labirinto do Fauno.__
 Caso você deseje obter a capa do exemplar, a consulta também é simples:
 
 ```
-Book book = Query.SearchBook("8551005197");
-Image cover = Query.SearchCover(book, ImageSize.L);
+Book book = await Query.SearchBook("8551005197");
+Image cover = await Query.SearchCover(book, ImageSize.L);
 ```
 Nesse contexto, `cover` contém a capa associada ao exemplar `book`, quando disponível. Se o desejado for converter um ISBN10 para ISBN13 ou vice versa, podemos usar um método da classe `ISBNParser`:
 
