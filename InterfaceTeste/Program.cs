@@ -11,7 +11,12 @@ namespace InterfaceTeste
     {
         private static bool Exit = false;
 
-        static async void Main(string[] args)
+        static void Main(string[] args)
+        {
+            Runtine(args).Wait();
+        }
+
+        private static async Task Runtine(string[] args)
         {
             if (args.Length != 0)
                 await ReadArgsAsync(args);
