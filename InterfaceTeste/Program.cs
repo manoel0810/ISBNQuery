@@ -3,6 +3,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace InterfaceTeste
 {
@@ -10,15 +11,15 @@ namespace InterfaceTeste
     {
         private static bool Exit = false;
 
-        static void Main(string[] args)
+        static async void Main(string[] args)
         {
             if (args.Length != 0)
-                ReadArgs(args);
+                await ReadArgsAsync(args);
 
             while (!Exit)
             {
                 Ponteiro();
-                ReadArgs();
+                await ReadArgsAsync();
             }
         }
 
@@ -50,7 +51,7 @@ namespace InterfaceTeste
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        private static void ReadArgs(string[] _args = null)
+        private static async Task ReadArgsAsync(string[] _args = null)
         {
             string[] args;
 
@@ -86,8 +87,8 @@ namespace InterfaceTeste
                 Console.ForegroundColor = ConsoleColor.White;
                 return;
             }
-            else if (args[0].Equals("/ib10")) { ISBN10Utility(args[1]); }
-            else if (args[0].Equals("/ib13")) { ISBN13Utility(args[1]); }
+            else if (args[0].Equals("/ib10")) { await ISBN10UtilityAsync(args[1]); }
+            else if (args[0].Equals("/ib13")) { await ISBN13UtilityAsync(args[1]); }
             else if (args[0].Equals("/conv")) { ConverteISBN(args[1]); }
             else if (args[0].Equals("/comp"))
                 if (args.Length < 3)
@@ -155,7 +156,7 @@ namespace InterfaceTeste
                         //System.Drawing.Image IMG = null;
                         //byte[] Bytes = new byte[] { };
                         Image img = new Bitmap(256, 256);
-                        Book book = Query.SearchBook(KEY);
+                        Book book = await Query.SearchBook(KEY);
                         if (book.HasCover == false)
                         {
                             Console.ForegroundColor = ConsoleColor.Red;
@@ -166,15 +167,15 @@ namespace InterfaceTeste
                         switch (Op)
                         {
                             case 'S':
-                                img = Query.SearchCover(book, ImageSize.S);
+                                img = await Query.SearchCover(book, ImageSize.S);
                                 //IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'M':
-                                img = Query.SearchCover(book, ImageSize.M);
+                                img = await Query.SearchCover(book, ImageSize.M);
                                 //var IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                             case 'L':
-                                img = Query.SearchCover(book, ImageSize.L);
+                                img = await Query.SearchCover(book, ImageSize.L);
                                 //IMG = Consultas.GetImageFromByteArray(Bytes);
                                 break;
                         }
@@ -215,7 +216,7 @@ namespace InterfaceTeste
             }
         }
 
-        private static void ISBN10Utility(string Args)
+        private static async Task ISBN10UtilityAsync(string Args)
         {
             if (Args.Replace(".", "").Replace("-", "").Replace(" ", "").Length != 10)
             {
@@ -227,7 +228,7 @@ namespace InterfaceTeste
 
             try
             {
-                Book book = Query.SearchBook(Args);
+                Book book = await Query.SearchBook(Args);
                 if (book != null)
                     ShowBook(book);
                 else
@@ -241,7 +242,7 @@ namespace InterfaceTeste
             return;
         }
 
-        private static void ISBN13Utility(string Args)
+        private static async Task ISBN13UtilityAsync(string Args)
         {
             if (Args.Replace(".", "").Replace("-", "").Replace(" ", "").Length != 13)
             {
@@ -253,7 +254,7 @@ namespace InterfaceTeste
 
             try
             {
-                Book book = Query.SearchBook(Args);
+                Book book = await Query.SearchBook(Args);
                 if (book != null)
                     ShowBook(book);
                 else
