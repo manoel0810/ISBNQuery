@@ -1,8 +1,6 @@
 ## __Sobre o ISBNQuery__
 Guia prático de uso da dll ISBNQuery para consultas online do ISBN de livros e similares.
 
-* A __Tech Team__ é uma pequena startup que traz quando possível, suas tecnologias para o público em geral, visando sempre compartilhar conhecimento.
-
 * O __ISBNQuery__ é uma forma de facilitar a consulta de um ISBN e obter algumas informações que podem ser importantes para o usuário. Sua implementação busca ser simples e direta.
 
 * Essa DLL é compatível com o Framework .NET 4.8 ou superior.
