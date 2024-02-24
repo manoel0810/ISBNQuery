@@ -90,4 +90,4 @@ Obterve que os códigos são conversíveis entre si, obtendo sempre os valores c
 | M (Medium) | 77           | Medium size   |
 | L (Large)  | 76           | Large size    |
 
-#### Tech™, Inc.
+#### Manoel Lira.
