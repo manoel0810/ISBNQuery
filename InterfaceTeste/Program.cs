@@ -105,7 +105,7 @@ namespace InterfaceTeste
                 }
                 else
                 {
-                    bool VERIFI = args[1].Equals(args[2]);
+                    bool VERIFI = args[1] == args[2];
                     if (VERIFI)
                     {
                         Console.ForegroundColor = ConsoleColor.DarkGreen;
@@ -116,7 +116,7 @@ namespace InterfaceTeste
                     else
                     {
                         Console.ForegroundColor = ConsoleColor.DarkRed;
-                        Console.WriteLine("Or argumentos são iguais");
+                        Console.WriteLine("Or argumentos não são iguais");
                         Console.ForegroundColor = ConsoleColor.White;
                         return;
                     }
