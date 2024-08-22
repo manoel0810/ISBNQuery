@@ -3,7 +3,7 @@ Guia prático de uso da dll ISBNQuery para consultas online do ISBN de livros e 
 
 * O __ISBNQuery__ é uma forma de facilitar a consulta de um ISBN e obter algumas informações que podem ser importantes para o usuário. Sua implementação busca ser simples e direta.
 
-* Essa DLL é compatível com o Framework .NET 4.8 ou superior.
+* Essa DLL é compatível com o Framework .NET 4.8 e .NET Core 8.
 
 ## Créditos:
 A dll ISBNQuery faz consultas online do código ISBN-10 e ISBN-13 a partir da [API](https://openlibrary.org/developers/) disponibilizada pelo site __Open Library__, disponível em: [Open Library](https://openlibrary.org/).
