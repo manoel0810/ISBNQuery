@@ -7,9 +7,9 @@ namespace ISBNQueryCoreTests
     public class ISBNQueryTests
     {
         [Fact]
-        public void ISBN13Search()
+        public async void ISBN13SearchAsync()
         {
-            Assert.True(Query.SearchBook("978-8551005194") != null);
+            Assert.True(await Query.SearchBook("978-8551005194") != null);
         }
 
         [Fact]
@@ -35,11 +35,11 @@ namespace ISBNQueryCoreTests
         public async Task SearchCoverAsync()
         {
             Book book = await Query.SearchBook("8551005197");
-            var response = await Query.SearchCover(book, ImageSize.L);
+            var response = await Query.SearchCover(book, ImageSize.L, default);
 
             Assert.IsType<SKImage>(response);
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => { await Query.SearchCover(null!, ImageSize.L); });
-            await Assert.ThrowsAsync<BookException>(async () => { await Query.SearchCover(new Book(), ImageSize.L); });
+            await Assert.ThrowsAsync<ArgumentNullException>(async () => { await Query.SearchCover(null!, ImageSize.L, default); });
+            await Assert.ThrowsAsync<BookException>(async () => { await Query.SearchCover(new Book(), ImageSize.L, default); });
         }
     }
 }

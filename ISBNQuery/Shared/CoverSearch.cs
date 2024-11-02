@@ -1,6 +1,7 @@
 ﻿using ISBNQuery.Erros;
 using System;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ISBNQuery.Shared
@@ -14,11 +15,12 @@ namespace ISBNQuery.Shared
         /// </summary>
         /// <param name="size">Tamanho da imagem</param>
         /// <param name="book">Objeto <see cref="Book"/> com as informações sobre o exemplar</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
         /// <returns>Um <see cref="Image"/> com a capa, se disponível</returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="BookException"></exception>
 
-        public static async Task<Image> GetCompostImage(ImageSize size, Book book)
+        public static async Task<Image> GetCompostImage(ImageSize size, Book book, CancellationToken cancellationToken)
         {
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
@@ -27,7 +29,7 @@ namespace ISBNQuery.Shared
             {
                 try
                 {
-                    byte[] imageBytes = await GetImageBytes((string.IsNullOrWhiteSpace(book.ISBN13) ? book.ISBN10 : book.ISBN13), size);
+                    byte[] imageBytes = await GetImageBytes((string.IsNullOrWhiteSpace(book.ISBN13) ? book.ISBN10 : book.ISBN13), size, cancellationToken);
                     Image image = ImageProcessor.GetImageFromByteArray(imageBytes);
                     return image;
                 }
@@ -40,10 +42,10 @@ namespace ISBNQuery.Shared
             throw new BookException("Cover unvaible");
         }
 
-        private static async Task<byte[]> GetImageBytes(string key, ImageSize size)
+        private static async Task<byte[]> GetImageBytes(string key, ImageSize size, CancellationToken cancellationToken)
         {
             string endPoint = string.Format("{0}{1}-{2}.jpg", _apiRoute, key, ((char)size).ToString());
-            return await DataDownload.DownloadAsyncData(endPoint);
+            return await DataDownload.DownloadAsyncData(endPoint, cancellationToken);
         }
     }
 }

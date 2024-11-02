@@ -39,7 +39,7 @@ namespace ISBNQueryTeste
         public async Task SearchCoverAsync()
         {
             Book book = await Query.SearchBook("8551005197");
-            Assert.IsInstanceOfType(Query.SearchCover(book, ImageSize.L), typeof(Task<Image>));
+            Assert.IsInstanceOfType(await Query.SearchCover(book, ImageSize.L), typeof(Image));
 
             await Assert.ThrowsExceptionAsync<ArgumentNullException>(async () => { await Query.SearchCover(null, ImageSize.L); });
             await Assert.ThrowsExceptionAsync<BookException>(async () => { await Query.SearchCover(new Book(), ImageSize.L); });

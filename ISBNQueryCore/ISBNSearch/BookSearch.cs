@@ -11,11 +11,12 @@ namespace ISBNQuery.ISBNSearch
         /// </summary>
         /// <param name="query">Interface para o código</param>
         /// <param name="isbn">Código de busca</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="BookException"></exception>
 
-        public static async Task<Book> Search(IISBNQuery query, string isbn)
+        public static async Task<Book> Search(IISBNQuery query, string isbn, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentNullException(nameof(isbn));
@@ -25,7 +26,7 @@ namespace ISBNQuery.ISBNSearch
             {
                 try
                 {
-                    Book book = await DataDownload.DownloadBookDataAsync(temp);
+                    Book book = await DataDownload.DownloadBookDataAsync(temp, cancellationToken);
                     return book;
                 }
                 catch (Exception e)
