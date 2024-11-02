@@ -2,6 +2,7 @@
 using ISBNQuery.Interface;
 using ISBNQuery.Shared;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ISBNQuery.ISBNSearch
@@ -33,14 +34,15 @@ namespace ISBNQuery.ISBNSearch
         /// Obtém os dados associados a um ISBN e retorna um objeto do tipo <see cref="Book"/>, caso exista
         /// </summary>
         /// <param name="isbn">Código ISBN para consulta</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
         /// <returns>Um objeto <see cref="Book"/> com os dados disponíveis na API da Open Libary</returns>
         /// <exception cref="BookException"></exception>
 
-        public async Task<Book> SearchBook(string isbn)
+        public async Task<Book> SearchBook(string isbn, CancellationToken cancellationToken)
         {
             try
             {
-                return await BookSearch.Search(this, isbn);
+                return await BookSearch.Search(this, isbn, cancellationToken);
             }
             catch (Exception ex)
             {

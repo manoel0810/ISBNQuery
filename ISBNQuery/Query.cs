@@ -4,6 +4,7 @@ using ISBNQuery.ISBNSearch;
 using ISBNQuery.Shared;
 using System;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ISBNQuery
@@ -19,12 +20,13 @@ namespace ISBNQuery
         /// Efetua uma consulta na API e retorna um objeto <see cref="Book"/> com as informações do exemplar, caso exista
         /// </summary>
         /// <param name="isbn">Código ISBN 10/13 para consulta</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         /// <exception cref="BookException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
 
-        public static async Task<Book> SearchBook(string isbn)
+        public static async Task<Book> SearchBook(string isbn, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentNullException(nameof(isbn));
@@ -35,7 +37,7 @@ namespace ISBNQuery
 
             IISBNQuery query = QueriableObject(temp);
             if (query.IsValid(temp) && query.ValidateISBN(temp) == query.ExpectedSuccessCode())
-                return await query.SearchBook(temp);
+                return await query.SearchBook(temp, cancellationToken);
 
             throw new BookException("error while trying to obtain and/or create book object");
         }
@@ -50,12 +52,13 @@ namespace ISBNQuery
         /// </summary>
         /// <param name="book">Objeto <see cref="Book"/> com os dados do exemplar</param>
         /// <param name="size">Define o tamanho da imagem a ser baixada</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="BookException"></exception>
         /// <exception cref="Exception"></exception>
 
-        public static async Task<Image> SearchCover(Book book, ImageSize size)
+        public static async Task<Image> SearchCover(Book book, ImageSize size, CancellationToken cancellationToken = default)
         {
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
@@ -65,7 +68,7 @@ namespace ISBNQuery
 
             try
             {
-                Image cover = await CoverSearch.GetCompostImage(size, book);
+                Image cover = await CoverSearch.GetCompostImage(size, book, cancellationToken);
                 return cover;
             }
             catch (Exception e)

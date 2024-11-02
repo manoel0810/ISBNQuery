@@ -1,6 +1,8 @@
 ﻿using ISBNQuery.Erros;
 using System;
 using System.Net;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 namespace ISBNQuery.Shared
 {
@@ -8,7 +10,7 @@ namespace ISBNQuery.Shared
     {
         private static readonly string _url = "https://openlibrary.org/api/books?bibkeys=ISBN:";
 
-        public static async Task<byte[]> DownloadAsyncData(string endPoibt)
+        public static async Task<byte[]> DownloadAsyncData(string endPoibt, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(endPoibt))
                 throw new ArgumentNullException(nameof(endPoibt));
@@ -17,13 +19,13 @@ namespace ISBNQuery.Shared
                 throw new InternetException("no internet avaible", null);
 
             byte[] data = new byte[1024];
-            using (WebClient client = new WebClient())
+            using (HttpClient client = new HttpClient())
             {
                 try
                 {
                     if (Uri.TryCreate(endPoibt, UriKind.Absolute, out Uri uri))
                     {
-                        data = await client.DownloadDataTaskAsync(uri);
+                        data = await client.GetByteArrayAsync(uri);
                     }
                 }
                 catch (Exception e)
@@ -35,7 +37,7 @@ namespace ISBNQuery.Shared
             return data;
         }
 
-        public static async Task<Book> DownloadBookDataAsync(string key)
+        public static async Task<Book> DownloadBookDataAsync(string key, CancellationToken cancellationToken = default)
         {
             key = StringValidate.RemoveUnwantedCases(key);
 
@@ -44,7 +46,7 @@ namespace ISBNQuery.Shared
                 if (!Internet.CheckInternet())
                     throw new InternetException("no internet avaible", null);
 
-                using (WebClient Client = new WebClient())
+                using (HttpClient Client = new HttpClient())
                 {
                     if (WindowsHelp.WindowsVersion().Contains("Windows 7"))
                     {
@@ -56,7 +58,7 @@ namespace ISBNQuery.Shared
                     string content = string.Empty;
                     if (Uri.TryCreate(searchKey, UriKind.Absolute, out Uri uri))
                     {
-                        content = await Client.DownloadStringTaskAsync(uri);
+                        content = await Client.GetStringAsync(uri);
                     }
                     else
                         throw new InternetException("there was a error while parsing Url to Uri object", null);

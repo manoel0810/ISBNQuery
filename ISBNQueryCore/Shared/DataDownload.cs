@@ -8,7 +8,7 @@ namespace ISBNQuery.Shared
     {
         private static readonly string _url = "https://openlibrary.org/api/books?bibkeys=ISBN:";
 
-        public static async Task<byte[]> DownloadAsyncData(string endPoibt)
+        public static async Task<byte[]> DownloadAsyncData(string endPoibt, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(endPoibt))
                 throw new ArgumentNullException(nameof(endPoibt));
@@ -21,7 +21,7 @@ namespace ISBNQuery.Shared
             {
                 if (Uri.TryCreate(endPoibt, UriKind.Absolute, out Uri uri))
                 {
-                    byte[] data = await client.GetByteArrayAsync(uri);
+                    byte[] data = await client.GetByteArrayAsync(uri, cancellationToken);
                     return data;
                 }
                 else
@@ -35,7 +35,7 @@ namespace ISBNQuery.Shared
             }
         }
 
-        public static async Task<Book> DownloadBookDataAsync(string key)
+        public static async Task<Book> DownloadBookDataAsync(string key, CancellationToken cancellationToken)
         {
             key = StringValidate.RemoveUnwantedCases(key);
 
@@ -49,7 +49,7 @@ namespace ISBNQuery.Shared
 
                 if (Uri.TryCreate(searchKey, UriKind.Absolute, out Uri uri))
                 {
-                    string content = await client.GetStringAsync(uri);
+                    string content = await client.GetStringAsync(uri, cancellationToken);
 
                     if (string.IsNullOrEmpty(content) || content.Length <= 4)
                         throw new ApiRequestJsonError($"API Request not found for: {searchKey}", new Exception());
