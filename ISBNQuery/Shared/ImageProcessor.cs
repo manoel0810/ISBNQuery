@@ -1,29 +1,27 @@
-﻿using ISBNQuery.Erros;
-using System;
-using System.Drawing;
+using ISBNQuery.Erros;
+using SkiaSharp;
 
 namespace ISBNQuery.Shared
 {
     internal class ImageProcessor
     {
         /// <summary>
-        /// Converte um array de bytes na sua imagem correspondente
+        /// Converte um array de bytes em uma imagem <see cref="SKImage"/> correspondente
         /// </summary>
         /// <param name="bytes">Bytes da imagem</param>
-        /// <returns>Imagem convertida</returns>
-
-        public static Image GetImageFromByteArray(byte[] bytes)
+        /// <returns>Objeto <see cref="SKImage"/> com a imagem carregada</returns>
+        public static SKImage GetImageFromByteArray(byte[] bytes)
         {
             if (bytes == null)
                 throw new ArgumentNullException(nameof(bytes));
 
             try
             {
-                using (System.IO.MemoryStream Stream = new System.IO.MemoryStream(bytes))
-                {
-                    var image = Image.FromStream(Stream);
-                    return image;
-                }
+                using var stream = new MemoryStream(bytes);
+                var image = SKImage.FromEncodedData(stream);
+                if (image == null)
+                    throw new BookException("Failed to decode image from byte array");
+                return image;
             }
             catch (Exception e)
             {

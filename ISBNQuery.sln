@@ -1,17 +1,10 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32228.430
+# Visual Studio Version 18
+VisualStudioVersion = 18.10.12201.205 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQuery", "ISBNQuery\ISBNQuery.csproj", "{E9D181D1-D6A7-40B8-8C08-29C05F963351}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InterfaceTeste", "InterfaceTeste\InterfaceTeste.csproj", "{8E9A043B-E016-48D6-8751-7FDE6B5D1BDE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQueryTeste", "ISBNQueryTeste\ISBNQueryTeste.csproj", "{615F9B10-08CD-443E-9256-37F978507156}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQueryCore", "ISBNQueryCore\ISBNQueryCore.csproj", "{E36D49F4-F41C-4BA1-8B4B-1A4C8FAA1B33}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQueryCoreTests", "ISBNQueryCoreTests\ISBNQueryCoreTests.csproj", "{8BA06B90-896A-41B5-848A-7083C0F4710C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQueryTests", "ISBNQueryTests\ISBNQueryTests.csproj", "{8BA06B90-896A-41B5-848A-7083C0F4710C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,18 +16,6 @@ Global
 		{E9D181D1-D6A7-40B8-8C08-29C05F963351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9D181D1-D6A7-40B8-8C08-29C05F963351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9D181D1-D6A7-40B8-8C08-29C05F963351}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E9A043B-E016-48D6-8751-7FDE6B5D1BDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E9A043B-E016-48D6-8751-7FDE6B5D1BDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E9A043B-E016-48D6-8751-7FDE6B5D1BDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E9A043B-E016-48D6-8751-7FDE6B5D1BDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{615F9B10-08CD-443E-9256-37F978507156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{615F9B10-08CD-443E-9256-37F978507156}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{615F9B10-08CD-443E-9256-37F978507156}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{615F9B10-08CD-443E-9256-37F978507156}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E36D49F4-F41C-4BA1-8B4B-1A4C8FAA1B33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E36D49F4-F41C-4BA1-8B4B-1A4C8FAA1B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E36D49F4-F41C-4BA1-8B4B-1A4C8FAA1B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E36D49F4-F41C-4BA1-8B4B-1A4C8FAA1B33}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BA06B90-896A-41B5-848A-7083C0F4710C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8BA06B90-896A-41B5-848A-7083C0F4710C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BA06B90-896A-41B5-848A-7083C0F4710C}.Release|Any CPU.ActiveCfg = Release|Any CPU

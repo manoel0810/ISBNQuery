@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ISBNQuery.Shared
+﻿namespace ISBNQuery.Shared
 {
     /// <summary>
     ///     Esta classe fornece métodos para verificar a validade dos códigos <b>ISBN-10</b> e <b>ISBN-13</b> e formatações <c>UTF-8</c>
@@ -94,7 +91,7 @@ namespace ISBNQuery.Shared
                 else
                     NS += s[i];
 
-                END:;
+            END:;
             }
 
             return NS;

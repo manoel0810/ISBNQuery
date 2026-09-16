@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+using ISBNQuery.Models;
 
 namespace ISBNQuery
 {
     /// <summary>
-    /// <br>pt-br: Fornece informações sobre um objeto <b>Book</b> carregado</br>
-    /// <br>en-us: Provides information about a loaded <b>Book</b> object</br>
+    /// <br>pt-br: Fornece informações sobre um objeto <b>Book</b> (Livro/Exemplar) retornado pela Open Library API</br>
+    /// <br>en-us: Provides information about a loaded <b>Book</b> object returned by Open Library API</br>
     /// </summary>
-
     public class Book
     {
-        // Mapeamento entre identificadores e campos
-        private static readonly Dictionary<string, Action<Book, string>> Mapeamento = new Dictionary<string, Action<Book, string>>
+        private static readonly Dictionary<string, Action<Book, string>> Mapeamento = new()
         {
             { "authors", (obj, valor) => obj.Author = valor },
             { "title", (obj, valor) => obj.Title = valor },
@@ -34,10 +31,8 @@ namespace ISBNQuery
         internal static Dictionary<string, Action<Book, string>> GetMap() => Mapeamento;
 
         /// <summary>
-        /// Define o valor do atributo n, com base na paridade de chave valor definida na classe Book
+        /// Define o valor de uma propriedade com base na paridade chave-valor
         /// </summary>
-        /// <param name="KVP">Chave-valor</param>
-
         public void SetPropertie(KeyValuePair<string, string> KVP)
         {
             if (Mapeamento.TryGetValue(KVP.Key, out var acao))
@@ -47,95 +42,113 @@ namespace ISBNQuery
         }
 
         /// <summary>
-        /// <br>pt-br: Obtém ou define o nome do <b>Autor</b></br>
-        /// <br>en-us: Gets or sets the name of the <b>Author</b></br>
+        /// Nome do Autor principal (ou autores concatenados por vírgula)
         /// </summary>
-        public string Author { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>Título</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the <b>Title</b> of the copy</br>
-        /// </summary>
-        public string Title { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>subtítulo</b> do exemplar</br>
-        /// <br>pt-br: Gets or sets the <b>subtitle</b> of the copy</br>
-        /// </summary>
-        public string SubTitle { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>ISBN10</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the <b>ISBN10</b> of the copy</br>
-        /// </summary>
-        public string ISBN10 { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>ISBN13</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the <b>ISBN13</b> of the copy</br>
-        /// </summary>
-        public string ISBN13 { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define a <b>Data de Publicação</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the <b>Publication Date</b> of the copy</br> 
-        /// </summary>
-        public string Publish_Date { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>Source Records</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the <b>Source Records</b> of the copy</br>
-        /// </summary>
-        public string Source_Records { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>Publicador</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the <b>Publisher</b> of the copy</br>
-        /// </summary>
-        public string Publishers { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define o <b>Formato</b> no qual o exemplar está disponibilizado</br>
-        /// <br>en-us: Gets or sets the <b>Format</b> in which the copy is available</br>
-        /// </summary>
-        public string Physical_Format { get; set; }
-        /// <summary>
-        /// <br>pt-br: Obtém ou define a data da <b>Última Revisão</b> do exemplar</br>
-        /// <br>en-us: Gets or sets the copy's <b>Last Revision</b> date</br>
-        /// </summary>
-        public string Latest_Revision { get; set; }
-
-        //------------------ New fields avaible ------------------------
+        public string? Author { get; set; }
 
         /// <summary>
-        /// <br>Obtém um breve resumo do exemplar, quando disponível</br>
-        /// <br>Get a brief summary of the copy, when available</br>
+        /// Título do exemplar
         /// </summary>
-        public string Description { get; set; }
-        /// <summary>
-        /// <br>Identifica o título original</br>
-        /// <br>Identifies the original title</br>
-        /// </summary>
-        public string TranslatedFrom { get; set; }
-        /// <summary>
-        /// <br>Número de páginas</br>
-        /// <br>Number of pages</br>
-        /// </summary>
-        public string NumberOfPages { get; set; }
-
-        //Especial fields
+        public string? Title { get; set; }
 
         /// <summary>
-        /// <br>Chave de pesquisa para query bib</br>
-        /// <br>Search key for query bib</br>
+        /// Subtítulo do exemplar
         /// </summary>
-        public string BibKey { get; set; }
+        public string? SubTitle { get; set; }
+
         /// <summary>
-        /// <br>Url para mais detalhes em https://openlibrary.org/</br>
-        /// <br>Url for more details at https://openlibrary.org/</br>
+        /// Código ISBN-10
         /// </summary>
-        public string InfoUrl { get; set; }
+        public string? ISBN10 { get; set; }
+
         /// <summary>
-        /// <br>Guarda a url para a capa do exemplar, quando disponível</br>
-        /// <br>Save the url for the cover of the copy, when available</br>
+        /// Código ISBN-13
         /// </summary>
-        public string ThumbnailUrl { get; set; }
+        public string? ISBN13 { get; set; }
+
         /// <summary>
-        /// <br><b>true</b>, quando há capa disponível</br>
-        /// <br><b>true</b>, when cover is available</br>
+        /// Data de Publicação
         /// </summary>
-        public bool HasCover => !string.IsNullOrWhiteSpace(ThumbnailUrl);
+        public string? Publish_Date { get; set; }
+
+        /// <summary>
+        /// Registros de origem (Source Records)
+        /// </summary>
+        public string? Source_Records { get; set; }
+
+        /// <summary>
+        /// Editora(s) / Publicador(es)
+        /// </summary>
+        public string? Publishers { get; set; }
+
+        /// <summary>
+        /// Formato Físico (Brochura, Capa Dura, eBook, etc.)
+        /// </summary>
+        public string? Physical_Format { get; set; }
+
+        /// <summary>
+        /// Data ou versão da última revisão
+        /// </summary>
+        public string? Latest_Revision { get; set; }
+
+        /// <summary>
+        /// Descrição ou resumo do livro
+        /// </summary>
+        public string? Description { get; set; }
+
+        /// <summary>
+        /// Título original de onde foi traduzido
+        /// </summary>
+        public string? TranslatedFrom { get; set; }
+
+        /// <summary>
+        /// Número de páginas
+        /// </summary>
+        public string? NumberOfPages { get; set; }
+
+        /// <summary>
+        /// Chave Bib (ex: ISBN:9788551005194)
+        /// </summary>
+        public string? BibKey { get; set; }
+
+        /// <summary>
+        /// URL de detalhes em openlibrary.org
+        /// </summary>
+        public string? InfoUrl { get; set; }
+
+        /// <summary>
+        /// URL para a imagem de capa (Thumbnail)
+        /// </summary>
+        public string? ThumbnailUrl { get; set; }
+
+        /// <summary>
+        /// Identificador da Edição na Open Library (OLID / Edition Key, ex: OL12345M)
+        /// </summary>
+        public string? EditionKey { get; set; }
+
+        /// <summary>
+        /// Identificador da Obra na Open Library (Work Key, ex: OL56789W)
+        /// </summary>
+        public string? WorkKey { get; set; }
+
+        /// <summary>
+        /// Assuntos / Tópicos associados ao livro
+        /// </summary>
+        public IReadOnlyList<string>? Subjects { get; set; }
+
+        /// <summary>
+        /// Lista detalhada de autores associados ao livro
+        /// </summary>
+        public IReadOnlyList<AuthorInfo>? AuthorsList { get; set; }
+
+        /// <summary>
+        /// IDs de capas disponíveis na Open Library Covers API
+        /// </summary>
+        public IReadOnlyList<long>? CoverIds { get; set; }
+
+        /// <summary>
+        /// Indica se há capa disponível para este livro
+        /// </summary>
+        public bool HasCover => !string.IsNullOrWhiteSpace(ThumbnailUrl) || (CoverIds != null && CoverIds.Count > 0) || !string.IsNullOrWhiteSpace(ISBN13) || !string.IsNullOrWhiteSpace(ISBN10);
     }
 }

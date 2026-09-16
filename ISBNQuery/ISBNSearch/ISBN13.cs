@@ -1,9 +1,6 @@
 ﻿using ISBNQuery.Erros;
 using ISBNQuery.Interface;
 using ISBNQuery.Shared;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ISBNQuery.ISBNSearch
 {

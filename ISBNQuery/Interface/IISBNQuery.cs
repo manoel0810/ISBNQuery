@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace ISBNQuery.Interface
+﻿namespace ISBNQuery.Interface
 {
     internal interface IISBNQuery
     {

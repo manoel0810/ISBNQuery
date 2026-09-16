@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ISBNQuery.Erros
+﻿namespace ISBNQuery.Erros
 {
     /// <summary>
     /// Fired when an api query returns no json value to create Book objects

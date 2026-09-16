@@ -1,39 +1,30 @@
-﻿using ISBNQuery.Erros;
+using ISBNQuery.Erros;
 using ISBNQuery.Interface;
 using ISBNQuery.ISBNSearch;
+using ISBNQuery.Models;
 using ISBNQuery.Shared;
-using System;
-using System.Drawing;
-using System.Threading;
-using System.Threading.Tasks;
+using SkiaSharp;
 
 namespace ISBNQuery
 {
     /// <summary>
-    ///     <br>pt-br: Esta classe possue os métodos necessários para se obter as informações dos ISBN-10 e ISBN-13</br>
-    ///     <br>en-us: This class has the methods necessary to obtain information from ISBN-10 and ISBN-13</br>
+    /// Classe principal com métodos para consulta de Livros, Autores e Capas/Fotos na Open Library API.
     /// </summary>
-
     public class Query
     {
         /// <summary>
-        /// Efetua uma consulta na API e retorna um objeto <see cref="Book"/> com as informações do exemplar, caso exista
+        /// Efetua uma consulta na API e retorna um objeto <see cref="Book"/> com as informações do exemplar.
         /// </summary>
-        /// <param name="isbn">Código ISBN 10/13 para consulta</param>
+        /// <param name="isbn">Código ISBN-10 ou ISBN-13 para consulta</param>
         /// <param name="cancellationToken">Token de cancelamento</param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        /// <exception cref="BookException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-
         public static async Task<Book> SearchBook(string isbn, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(isbn))
                 throw new ArgumentNullException(nameof(isbn));
 
             string temp = StringValidate.RemoveUnwantedCases(isbn);
-            if (IsWrongLenght(temp) || !StringValidate.IsNumeric(temp, true))
-                throw new Exception("isbn code wrong");
+            if (IsWrongLength(temp) || !StringValidate.IsNumeric(temp, true))
+                throw new ArgumentException("isbn code wrong", nameof(isbn));
 
             IISBNQuery query = QueriableObject(temp);
             if (query.IsValid(temp) && query.ValidateISBN(temp) == query.ExpectedSuccessCode())
@@ -42,40 +33,105 @@ namespace ISBNQuery
             throw new BookException("error while trying to obtain and/or create book object");
         }
 
-        private static bool IsWrongLenght(string code)
+        /// <summary>
+        /// Alias assíncrono para <see cref="SearchBook"/>.
+        /// </summary>
+        public static Task<Book> SearchBookAsync(string isbn, CancellationToken cancellationToken = default)
         {
-            return (code.Length > 13 || code.Length < 10);
+            return SearchBook(isbn, cancellationToken);
         }
 
         /// <summary>
-        /// Obtém a capa do exemplar, caso disponível
+        /// Consulta informações detalhadas sobre um autor na Open Library API.
         /// </summary>
-        /// <param name="book">Objeto <see cref="Book"/> com os dados do exemplar</param>
-        /// <param name="size">Define o tamanho da imagem a ser baixada</param>
+        /// <param name="authorKey">Chave da Open Library do autor (ex: OL26320A ou /authors/OL26320A)</param>
         /// <param name="cancellationToken">Token de cancelamento</param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="BookException"></exception>
-        /// <exception cref="Exception"></exception>
+        public static async Task<AuthorInfo> SearchAuthorAsync(string authorKey, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(authorKey))
+                throw new ArgumentNullException(nameof(authorKey));
 
-        public static async Task<Image> SearchCover(Book book, ImageSize size, CancellationToken cancellationToken = default)
+            return await DataDownload.DownloadAuthorDataAsync(authorKey, cancellationToken);
+        }
+
+        /// <summary>
+        /// Realiza pesquisa de autores por nome na Open Library API.
+        /// </summary>
+        /// <param name="authorNameQuery">Termo ou nome do autor para busca</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
+        public static async Task<IReadOnlyList<AuthorInfo>> SearchAuthorsByNameAsync(string authorNameQuery, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(authorNameQuery))
+                throw new ArgumentNullException(nameof(authorNameQuery));
+
+            return await DataDownload.SearchAuthorsAsync(authorNameQuery, cancellationToken);
+        }
+
+        /// <summary>
+        /// Obtém a capa do exemplar como <see cref="SKImage"/>.
+        /// </summary>
+        /// <param name="book">Objeto <see cref="Book"/> com dados do livro</param>
+        /// <param name="size">Tamanho da imagem (S, M, L)</param>
+        /// <param name="cancellationToken">Token de cancelamento</param>
+        public static async Task<SKImage> SearchCover(Book book, ImageSize size, CancellationToken cancellationToken = default)
         {
             if (book == null)
                 throw new ArgumentNullException(nameof(book));
 
             if (!book.HasCover)
-                throw new BookException("no cover avaible");
+                throw new BookException("no cover available");
 
             try
             {
-                Image cover = await CoverSearch.GetCompostImage(size, book, cancellationToken);
-                return cover;
+                return await CoverSearch.GetCompostImage(size, book, cancellationToken);
             }
             catch (Exception e)
             {
                 throw new Exception("image cover get error", e);
             }
+        }
 
+        /// <summary>
+        /// Obtém a capa de um livro utilizando o modelo <see cref="CoverInfo"/>.
+        /// </summary>
+        public static async Task<SKImage> SearchCoverAsync(CoverInfo coverInfo, CancellationToken cancellationToken = default)
+        {
+            if (coverInfo == null)
+                throw new ArgumentNullException(nameof(coverInfo));
+
+            return await CoverSearch.GetImageAsync(coverInfo, cancellationToken);
+        }
+
+        /// <summary>
+        /// Obtém a capa de um livro especificando tipo de chave, valor e tamanho.
+        /// </summary>
+        public static async Task<SKImage> SearchCoverAsync(string key, CoverKeyType keyType, ImageSize size, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentNullException(nameof(key));
+
+            var coverInfo = new CoverInfo(keyType, key, size, isAuthorPhoto: false);
+            return await CoverSearch.GetImageAsync(coverInfo, cancellationToken);
+        }
+
+        /// <summary>
+        /// Obtém a foto de um autor especificando a chave/ID do autor e tamanho.
+        /// </summary>
+        public static async Task<SKImage> SearchAuthorPhotoAsync(string authorKeyOrPhotoId, ImageSize size, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(authorKeyOrPhotoId))
+                throw new ArgumentNullException(nameof(authorKeyOrPhotoId));
+
+            string cleanKey = authorKeyOrPhotoId.Replace("/authors/", "").Trim();
+            CoverKeyType keyType = long.TryParse(cleanKey, out _) ? CoverKeyType.Id : CoverKeyType.Olid;
+            var coverInfo = new CoverInfo(keyType, cleanKey, size, isAuthorPhoto: true);
+
+            return await CoverSearch.GetImageAsync(coverInfo, cancellationToken);
+        }
+
+        private static bool IsWrongLength(string code)
+        {
+            return (code.Length > 13 || code.Length < 10);
         }
 
         private static IISBNQuery QueriableObject(string isbn)

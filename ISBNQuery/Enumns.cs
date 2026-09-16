@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ISBNQuery
+﻿namespace ISBNQuery
 {
     /// <summary>
     /// Tamanhos disponíveis da imagem

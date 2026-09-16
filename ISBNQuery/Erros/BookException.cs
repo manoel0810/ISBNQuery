@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ISBNQuery.Erros
+﻿namespace ISBNQuery.Erros
 {
     /// <summary>
     /// Generic error when creating the Book object
