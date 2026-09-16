@@ -1,43 +1,30 @@
-﻿using ISBNQuery.Erros;
+using ISBNQuery.Erros;
 using ISBNQuery.Interface;
 using ISBNQuery.Shared;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ISBNQuery.ISBNSearch
 {
     /// <summary>
-    /// Representa a estrutura para o código ISBN-10
+    /// Representa a estrutura para validação e consulta do código ISBN-10
     /// </summary>
-
     public class ISBN10 : IISBNQuery
     {
         /// <summary>
-        /// Retorna o valor padrão para sucesso da valição do ISBN
+        /// Retorna o valor de sucesso da validação do ISBN-10
         /// </summary>
-        /// <returns></returns>
         public ReturnType ExpectedSuccessCode() => ReturnType.ValidISBN10;
 
         /// <summary>
-        /// Verifica está no formato válido
+        /// Verifica se o código contém apenas caracteres numéricos ou 'X' no final
         /// </summary>
-        /// <param name="value">Valor para teste</param>
-        /// <returns>true, caso esteja no formato válido</returns>
-
         public bool IsValid(string value)
         {
             return StringValidate.IsNumeric(value, true);
         }
 
         /// <summary>
-        /// Obtém os dados associados a um ISBN e retorna um objeto do tipo <see cref="Book"/>, caso exista
+        /// Obtém os dados associados a um ISBN-10 e retorna um objeto <see cref="Book"/>
         /// </summary>
-        /// <param name="isbn">Código ISBN para consulta</param>
-        /// <param name="cancellationToken">Token de cancelamento</param>
-        /// <returns>Um objeto <see cref="Book"/> com os dados disponíveis na API da Open Libary</returns>
-        /// <exception cref="BookException"></exception>
-
         public async Task<Book> SearchBook(string isbn, CancellationToken cancellationToken)
         {
             try
@@ -49,34 +36,39 @@ namespace ISBNQuery.ISBNSearch
                 throw new BookException("error while book search", ex);
             }
         }
-        /// <summary>
-        /// Verifica se um código ISBN é válido e está com o dígito de verificação correto
-        /// </summary>
-        /// <param name="isbn">Código ISBN para verificação</param>
-        /// <returns>Retorna uma flag do tipo <see cref="ReturnType"/> com o resultado do teste</returns>
 
+        /// <summary>
+        /// Verifica se o código ISBN-10 é válido segundo o algoritmo do dígito verificador
+        /// </summary>
         public ReturnType ValidateISBN(string isbn)
         {
             if (string.IsNullOrEmpty(isbn))
-                return ReturnType.NullArgumentException;
+                return ReturnType.NullArgument;
 
             if (!StringValidate.IsNumeric(isbn, true))
-                return ReturnType.InvalidInputFormat;
+                return ReturnType.InvalidFormat;
 
-            if (isbn.Length != 0xa /*10DEC*/)
-                return ReturnType.ISBN10LenghtError;
+            if (isbn.Length != 10)
+                return ReturnType.ISBN10LengthError;
 
-            int[] Produtos = new int[0x9], ISBN = new int[0xa];
-            for (int Position = 0x0; Position < ISBN.Length; Position++)
-                ISBN[Position] = isbn.Substring(Position, 0x1).ToUpper() == "X" ? 0xa : int.Parse(isbn.Substring(Position, 0x1));
+            int[] produtos = new int[9];
+            int[] isbnDigits = new int[10];
 
-            for (int Elemento = 0x0; Elemento < 0x9; Elemento++)
-                Produtos[Elemento] = ISBN[Elemento] * (Elemento + 0x1);
+            for (int position = 0; position < isbnDigits.Length; position++)
+            {
+                string charAt = isbn.Substring(position, 1);
+                isbnDigits[position] = charAt.Equals("X", StringComparison.OrdinalIgnoreCase) ? 10 : int.Parse(charAt);
+            }
 
-            MathHelp.Sum(Produtos, out int Resultado);
-            int Test = Resultado % 0xb;
+            for (int i = 0; i < 9; i++)
+            {
+                produtos[i] = isbnDigits[i] * (i + 1);
+            }
 
-            if (Test == ISBN[0x9])
+            MathHelp.Sum(produtos, out int resultado);
+            int test = resultado % 11;
+
+            if (test == isbnDigits[9])
                 return ReturnType.ValidISBN10;
             else
                 return ReturnType.InvalidISBN10;

@@ -1,21 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace ISBNQuery
 {
     [Serializable]
     internal class Rootobject
     {
-        public Generic Generic { get; set; }
+        public Generic Generic { get; set; } = default!;
     }
 
     [Serializable]
     internal class Generic
     {
-        //TODO: manipulate arrays so that json returns with more than one list component can be accessed by indexing
-
-        private readonly Dictionary<string, Func<Generic, string>> Access = new Dictionary<string, Func<Generic, string>>()
+        private readonly Dictionary<string, Func<Generic, string?>> Access = new()
         {
             { "bib_key", (obj) => obj.BibKey },
             { "info_url", (obj) => obj.InfoUrl },
@@ -24,7 +20,7 @@ namespace ISBNQuery
             { "thumbnail_url", (obj) => obj.ThumbnailUrl }
         };
 
-        private string Query(string key)
+        private string? Query(string key)
         {
             if (Access.TryGetValue(key, out var f))
             {
@@ -34,31 +30,31 @@ namespace ISBNQuery
             return null;
         }
 
-        public string this[string key] => Query(key);
+        public string? this[string key] => Query(key);
 
-        [JsonProperty("bib_key")]
-        public string BibKey { get; set; }
+        [JsonPropertyName("bib_key")]
+        public string? BibKey { get; set; }
 
-        [JsonProperty("info_url")]
-        public string InfoUrl { get; set; }
+        [JsonPropertyName("info_url")]
+        public string? InfoUrl { get; set; }
 
-        [JsonProperty("preview")]
-        public string Preview { get; set; }
+        [JsonPropertyName("preview")]
+        public string? Preview { get; set; }
 
-        [JsonProperty("preview_url")]
-        public string PreviewUrl { get; set; }
+        [JsonPropertyName("preview_url")]
+        public string? PreviewUrl { get; set; }
 
-        [JsonProperty("thumbnail_url")]
-        public string ThumbnailUrl { get; set; }
+        [JsonPropertyName("thumbnail_url")]
+        public string? ThumbnailUrl { get; set; }
 
-        [JsonProperty("details")]
-        public Details Details { get; set; }
+        [JsonPropertyName("details")]
+        public Details? Details { get; set; }
     }
 
     [Serializable]
     internal class Details
     {
-        private readonly Dictionary<string, Func<Details, string>> Access = new Dictionary<string, Func<Details, string>>()
+        private readonly Dictionary<string, Func<Details, string?>> Access = new()
         {
             { "title", (obj) => obj.Title },
             { "subtitle", (obj) => obj.Subtitle },
@@ -73,7 +69,7 @@ namespace ISBNQuery
             { "revision", (obj) => obj.Revision.ToString() },
         };
 
-        private string Query(string key)
+        private string? Query(string key)
         {
             if (Access.TryGetValue(key, out var f))
             {
@@ -83,95 +79,95 @@ namespace ISBNQuery
             return null;
         }
 
-        public string this[string key] => Query(key);
+        public string? this[string key] => Query(key);
 
-        [JsonProperty("type")]
-        public Type BookType { get; set; }
+        [JsonPropertyName("type")]
+        public BookType? BookType { get; set; }
 
-        [JsonProperty("title")]
-        public string Title { get; set; }
+        [JsonPropertyName("title")]
+        public string? Title { get; set; }
 
-        [JsonProperty("subtitle")]
-        public string Subtitle { get; set; }
+        [JsonPropertyName("subtitle")]
+        public string? Subtitle { get; set; }
 
-        [JsonProperty("authors")]
-        public Author[] Authors { get; set; }
+        [JsonPropertyName("authors")]
+        public LegacyAuthor[]? Authors { get; set; }
 
-        [JsonProperty("source_records")]
-        public string[] SourceRecords { get; set; }
+        [JsonPropertyName("source_records")]
+        public string[]? SourceRecords { get; set; }
 
-        [JsonProperty("publishers")]
-        public string[] Publishers { get; set; }
+        [JsonPropertyName("publishers")]
+        public string[]? Publishers { get; set; }
 
-        [JsonProperty("physical_format")]
-        public string PhysicalFormat { get; set; }
+        [JsonPropertyName("physical_format")]
+        public string? PhysicalFormat { get; set; }
 
-        [JsonProperty("covers")]
-        public int[] Covers { get; set; }
+        [JsonPropertyName("covers")]
+        public int[]? Covers { get; set; }
 
-        [JsonProperty("works")]
-        public Work[] Works { get; set; }
+        [JsonPropertyName("works")]
+        public Work[]? Works { get; set; }
 
-        [JsonProperty("key")]
-        public string Key { get; set; }
+        [JsonPropertyName("key")]
+        public string? Key { get; set; }
 
-        [JsonProperty("identifiers")]
-        public Identifiers Identifiers { get; set; }
+        [JsonPropertyName("identifiers")]
+        public Identifiers? Identifiers { get; set; }
 
-        [JsonProperty("classifications")]
-        public Classifications Classifications { get; set; }
+        [JsonPropertyName("classifications")]
+        public Classifications? Classifications { get; set; }
 
-        [JsonProperty("contributors")]
-        public Contributor[] Contributors { get; set; }
+        [JsonPropertyName("contributors")]
+        public Contributor[]? Contributors { get; set; }
 
-        [JsonProperty("publish_date")]
-        public string PublishDate { get; set; }
+        [JsonPropertyName("publish_date")]
+        public string? PublishDate { get; set; }
 
-        [JsonProperty("languages")]
-        public Language[] Languages { get; set; }
+        [JsonPropertyName("languages")]
+        public Language[]? Languages { get; set; }
 
-        [JsonProperty("physical_dimensions")]
-        public string PhysicalDimensions { get; set; }
+        [JsonPropertyName("physical_dimensions")]
+        public string? PhysicalDimensions { get; set; }
 
-        [JsonProperty("number_of_pages")]
+        [JsonPropertyName("number_of_pages")]
         public int NumbeOfPages { get; set; }
 
-        [JsonProperty("description")]
-        public string Description { get; set; }
+        [JsonPropertyName("description")]
+        public string? Description { get; set; }
 
-        [JsonProperty("translation_of")]
-        public string TranslationOf { get; set; }
+        [JsonPropertyName("translation_of")]
+        public string? TranslationOf { get; set; }
 
-        [JsonProperty("publish_places")]
-        public string[] PublishPlaces { get; set; }
+        [JsonPropertyName("publish_places")]
+        public string[]? PublishPlaces { get; set; }
 
-        [JsonProperty("translated_from")]
-        public Translated_From[] TranslatedFrom { get; set; }
+        [JsonPropertyName("translated_from")]
+        public Translated_From[]? TranslatedFrom { get; set; }
 
-        [JsonProperty("isbn_10")]
-        public string[] ISBN10 { get; set; }
+        [JsonPropertyName("isbn_10")]
+        public string[]? ISBN10 { get; set; }
 
-        [JsonProperty("isbn_13")]
-        public string[] ISBN13 { get; set; }
+        [JsonPropertyName("isbn_13")]
+        public string[]? ISBN13 { get; set; }
 
-        [JsonProperty("latest_revision")]
+        [JsonPropertyName("latest_revision")]
         public int LatestRevision { get; set; }
 
-        [JsonProperty("revision")]
+        [JsonPropertyName("revision")]
         public int Revision { get; set; }
 
-        [JsonProperty("created")]
-        public Created Created { get; set; }
+        [JsonPropertyName("created")]
+        public Created? Created { get; set; }
 
-        [JsonProperty("last_modified")]
-        public Last_Modified LastModified { get; set; }
+        [JsonPropertyName("last_modified")]
+        public Last_Modified? LastModified { get; set; }
     }
 
     [Serializable]
-    internal class Type
+    internal class BookType
     {
-        [JsonProperty("key")]
-        public string Key { get; set; }
+        [JsonPropertyName("key")]
+        public string? Key { get; set; }
     }
 
     [Serializable]
@@ -189,61 +185,61 @@ namespace ISBNQuery
     [Serializable]
     internal class Created
     {
-        [JsonProperty("type")]
-        public string Type { get; set; }
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
 
-        [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public DateTime Value { get; set; }
     }
 
     [Serializable]
     internal class Last_Modified
     {
-        [JsonProperty("type")]
-        public string Type { get; set; }
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
 
-        [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public DateTime Value { get; set; }
     }
 
     [Serializable]
-    internal class Author
+    internal class LegacyAuthor
     {
-        [JsonProperty("key")]
-        public string Key { get; set; }
+        [JsonPropertyName("key")]
+        public string? Key { get; set; }
 
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
     }
 
     [Serializable]
     internal class Work
     {
-        [JsonProperty("key")]
-        public string Key { get; set; }
+        [JsonPropertyName("key")]
+        public string? Key { get; set; }
     }
 
     [Serializable]
     internal class Contributor
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
 
-        [JsonProperty("role")]
-        public string Role { get; set; }
+        [JsonPropertyName("role")]
+        public string? Role { get; set; }
     }
 
     [Serializable]
     internal class Language
     {
-        [JsonProperty("key")]
-        public string Key { get; set; }
+        [JsonPropertyName("key")]
+        public string? Key { get; set; }
     }
 
     [Serializable]
     internal class Translated_From
     {
-        [JsonProperty("key")]
-        public string Key { get; set; }
+        [JsonPropertyName("key")]
+        public string? Key { get; set; }
     }
 }

@@ -1,36 +1,16 @@
-﻿using System;
-
 namespace ISBNQuery.Erros
 {
     /// <summary>
-    /// Triggers whenever a generic internet error occurs
+    /// Disparado quando ocorre um erro genérico de rede/internet
     /// </summary>
-    public class InternetException : Exception
+    public class InternetException(string message, Exception? innerException = null) : Exception(message, innerException)
     {
-        /// <summary> 
-        /// Throws a new exception 
-        /// </summary> 
-        /// <param name="message">Nice message</param> 
-        /// <param name="innerException">Stack of previous error</param>
-        public InternetException(string message, Exception innerException) : base(message, innerException)
-        {
-            //TODO: Implement necessary fields (if necessary)
-        }
     }
 
     /// <summary>
-    /// Fires whenever the server returns code 404
+    /// Disparado quando o servidor remoto retorna HTTP 404 (Recurso não encontrado)
     /// </summary>
-    public class InternetException404 : Exception
+    public class InternetException404(string message, Exception? innerException = null) : Exception(message, innerException)
     {
-        /// <summary> 
-        /// Throws a new exception 
-        /// </summary> 
-        /// <param name="message">Nice message</param> 
-        /// <param name="innerException">Stack of previous error</param>
-        public InternetException404(string message, Exception innerException) : base(message, innerException)
-        {
-            //TODO: Implement necessary fields (if necessary)
-        }
     }
 }
