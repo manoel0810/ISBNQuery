@@ -10,7 +10,7 @@
 
     <!-- Configurações do Pacote NuGet -->
     <PackageId>ISBNQuery</PackageId>
-    <Version>2.0.0</Version>
+    <Version>3.0.0</Version>
     <Authors>manoel0810</Authors>
     <Company>manoel0810</Company>
     <Product>ISBNQuery</Product>

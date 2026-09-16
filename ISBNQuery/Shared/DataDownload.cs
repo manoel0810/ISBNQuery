@@ -12,7 +12,7 @@ namespace ISBNQuery.Shared
         private static HttpClient CreateHttpClient()
         {
             var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("ISBNQuery/2.0 (+https://github.com/manoel0810/ISBNQuery)");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("ISBNQuery/3.0 (+https://github.com/manoel0810/ISBNQuery)");
             return client;
         }
 
