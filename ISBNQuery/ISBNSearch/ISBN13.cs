@@ -1,40 +1,30 @@
-﻿using ISBNQuery.Erros;
+using ISBNQuery.Erros;
 using ISBNQuery.Interface;
 using ISBNQuery.Shared;
 
 namespace ISBNQuery.ISBNSearch
 {
     /// <summary>
-    /// Representa a estrutura para o código ISBN-13
+    /// Representa a estrutura para validação e consulta do código ISBN-13
     /// </summary>
-
     public class ISBN13 : IISBNQuery
     {
         /// <summary>
-        /// Retorna o valor padrão para sucesso da valição do ISBN
+        /// Retorna o valor de sucesso da validação do ISBN-13
         /// </summary>
-        /// <returns></returns>
         public ReturnType ExpectedSuccessCode() => ReturnType.ValidISBN13;
 
         /// <summary>
-        /// Verifica está no formato válido
+        /// Verifica se o código contém apenas caracteres numéricos
         /// </summary>
-        /// <param name="value">Valor para teste</param>
-        /// <returns>true, caso esteja no formato válido</returns>
-
         public bool IsValid(string value)
         {
             return StringValidate.IsNumeric(value, true);
         }
 
         /// <summary>
-        /// Obtém os dados associados a um ISBN e retorna um objeto do tipo <see cref="Book"/>, caso exista
+        /// Obtém os dados associados a um ISBN-13 e retorna um objeto <see cref="Book"/>
         /// </summary>
-        /// <param name="isbn">Código ISBN para consulta</param>
-        /// <param name="cancellationToken">Token de cancelamento</param>
-        /// <returns>Um objeto <see cref="Book"/> com os dados disponíveis na API da Open Libary</returns>
-        /// <exception cref="BookException"></exception>
-
         public async Task<Book> SearchBook(string isbn, CancellationToken cancellationToken)
         {
             try
@@ -48,32 +38,36 @@ namespace ISBNQuery.ISBNSearch
         }
 
         /// <summary>
-        /// Verifica se um código ISBN é válido e está com o dígito de verificação correto
+        /// Verifica se o código ISBN-13 é válido segundo o algoritmo do dígito verificador
         /// </summary>
-        /// <param name="isbn">Código ISBN para verificação</param>
-        /// <returns>Retorna uma flag do tipo <see cref="ReturnType"/> com o resultado do teste</returns>
-
         public ReturnType ValidateISBN(string isbn)
         {
             if (string.IsNullOrEmpty(isbn))
-                return ReturnType.NullArgumentException;
+                return ReturnType.NullArgument;
 
             if (!StringValidate.IsNumeric(isbn))
-                return ReturnType.InvalidInputFormat;
+                return ReturnType.InvalidFormat;
 
-            if (isbn.Length != 0xd /*13DEC*/)
-                return ReturnType.ISBN13LenghtError;
+            if (isbn.Length != 13)
+                return ReturnType.ISBN13LengthError;
 
-            int[] Produtos = new int[0xc], ISBN = new int[0xd];
-            for (int Position = 0x0; Position < ISBN.Length; Position++)
-                ISBN[Position] = int.Parse(isbn.Substring(Position, 0x1));
+            int[] produtos = new int[12];
+            int[] isbnDigits = new int[13];
 
-            for (int Elemento = 0x0; Elemento < 0xc; Elemento++)
-                Produtos[Elemento] = ISBN[Elemento] * (Elemento % 0x2 == 0x0 ? 0x1 : 0x3);
+            for (int position = 0; position < isbnDigits.Length; position++)
+            {
+                isbnDigits[position] = int.Parse(isbn.Substring(position, 1));
+            }
 
-            MathHelp.Sum(Produtos, out int Resultado);
-            int Test = (Resultado + ISBN[0xc]) % 0xa;
-            if (Test == 0x0)
+            for (int i = 0; i < 12; i++)
+            {
+                produtos[i] = isbnDigits[i] * (i % 2 == 0 ? 1 : 3);
+            }
+
+            MathHelp.Sum(produtos, out int resultado);
+            int test = (resultado + isbnDigits[12]) % 10;
+
+            if (test == 0)
                 return ReturnType.ValidISBN13;
             else
                 return ReturnType.InvalidISBN13;

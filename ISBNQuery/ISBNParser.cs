@@ -1,4 +1,4 @@
-﻿using ISBNQuery.Erros;
+using ISBNQuery.Erros;
 using ISBNQuery.Shared;
 
 namespace ISBNQuery
@@ -6,17 +6,15 @@ namespace ISBNQuery
     /// <summary>
     /// Fornece métodos para conversão e operações com códigos ISBN
     /// </summary>
-
     public class ISBNParser
     {
         /// <summary>
-        /// Converte um ISBN-10 em ISBN-13 e vice versa
+        /// Converte um ISBN-10 em ISBN-13 e vice-versa
         /// </summary>
-        /// <param name="isbn">Código para conversão</param>
-        /// <returns>Um código ISBN10 ou ISBN13</returns>
+        /// <param name="isbn">Código ISBN para conversão</param>
+        /// <returns>Um código convertido em ISBN-10 ou ISBN-13</returns>
         /// <exception cref="FormatExceptionArgument"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-
         public static string ParseISBN(string isbn)
         {
             if (string.IsNullOrWhiteSpace(isbn))
@@ -28,53 +26,49 @@ namespace ISBNQuery
             else if (temp.Length == 13)
                 return Parse13(isbn);
 
-
-            throw new FormatExceptionArgument("ISBN code wrong", new Exception(), ReturnType.InvalidInputFormat);
+            throw new FormatExceptionArgument("ISBN code wrong", new Exception(), ReturnType.InvalidFormat);
         }
 
         private static string Parse10(string isbn)
         {
-            int Soma = 0, fator = 1, digito = 0;
-            int[] Valores = new int[12];
+            int soma = 0, fator = 1, digito = 0;
+            int[] valores = new int[12];
 
-            Valores[0] = 9;
-            Valores[1] = 7;
-            Valores[2] = 8;
+            valores[0] = 9;
+            valores[1] = 7;
+            valores[2] = 8;
 
             for (int i = 3; i < 12; i++)
-                Valores[i] = int.Parse(Convert.ToString(isbn[i - 3]));
+                valores[i] = int.Parse(isbn[i - 3].ToString());
 
             for (int i = 0; i < 12; i++)
             {
-                Soma += Valores[i] * fator;
+                soma += valores[i] * fator;
                 fator = fator == 1 ? 3 : 1;
             }
 
-            int mod = Soma % 10;
+            int mod = soma % 10;
             if (mod != 0) { digito = 10 - mod; }
 
-            return String.Format("978{0}{1}", isbn.Substring(0, 9), digito);
+            return string.Format("978{0}{1}", isbn.Substring(0, 9), digito);
         }
 
         private static string Parse13(string isbn)
         {
-            int[] Valores = new int[9];
+            int[] valores = new int[9];
             for (int i = 3; i < 12; i++)
-                Valores[i - 3] = int.Parse(isbn[i].ToString());
+                valores[i - 3] = int.Parse(isbn[i].ToString());
 
-            int Soma = 0, fator = 10;
+            int soma = 0, fator = 10;
             for (int i = 0; i < 9; i++)
-                Soma += Valores[i] * (fator - i);
+                soma += valores[i] * (fator - i);
 
-            int mod = Soma % 11;
+            int mod = soma % 11;
             int digito = 0;
             if (mod != 0) { digito = 11 - mod; }
 
-            string part = "";
-            foreach (int i in Valores)
-                part += i.ToString();
-
-            return String.Format("{0}{1}", part, digito != 10 ? digito.ToString() : "X");
+            string part = string.Concat(valores);
+            return string.Format("{0}{1}", part, digito != 10 ? digito.ToString() : "X");
         }
     }
 }

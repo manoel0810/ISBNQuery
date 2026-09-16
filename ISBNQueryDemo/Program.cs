@@ -1,4 +1,5 @@
 using ISBNQuery;
+using ISBNQuery.ISBNSearch;
 using ISBNQuery.Models;
 using SkiaSharp;
 using System.Text;
@@ -17,7 +18,7 @@ namespace ISBNQueryDemo
             try
             {
                 // 1. Validação e Conversão de ISBN
-                TestIsbnParsing();
+                TestIsbnParsingAndValidation();
 
                 // 2. Consulta de Livro por ISBN-13
                 await TestBookSearchAsync("978-8551005194");
@@ -48,22 +49,34 @@ namespace ISBNQueryDemo
             }
         }
 
-        private static void TestIsbnParsing()
+        private static void TestIsbnParsingAndValidation()
         {
-            PrintSubHeader("1. VALIDAÇÃO E CONVERSÃO DE ISBN");
+            PrintSubHeader("1. VALIDAÇÃO E CONVERSÃO DE ISBN (ReturnType)");
 
             string isbn10 = "658021001X";
             string isbn13 = "9786580210015";
+            string invalidIsbn = "1234567890";
+
+            // Testando instâncias de validação
+            var checker10 = new ISBN10();
+            var checker13 = new ISBN13();
+
+            ReturnType res10 = checker10.ValidateISBN(isbn10);
+            ReturnType res13 = checker13.ValidateISBN(isbn13);
+            ReturnType resInvalid = checker10.ValidateISBN(invalidIsbn);
+
+            Console.WriteLine($"  Validação ISBN-10 ({isbn10})....: {res10} (IsSuccess: {res10.IsSuccess()})");
+            Console.WriteLine($"  Validação ISBN-13 ({isbn13})....: {res13} (IsSuccess: {res13.IsSuccess()})");
+            Console.WriteLine($"  Validação Inválida ({invalidIsbn}).: {resInvalid} (IsSuccess: {resInvalid.IsSuccess()})");
 
             string convertedTo13 = ISBNParser.ParseISBN(isbn10);
             string convertedTo10 = ISBNParser.ParseISBN(isbn13);
 
-            Console.WriteLine($"  ISBN-10 Original...: {isbn10}");
-            Console.WriteLine($"  Convertido para 13.: {convertedTo13} (Esperado: {isbn13})");
-            Console.WriteLine($"  ISBN-13 Original...: {isbn13}");
-            Console.WriteLine($"  Convertido para 10.: {convertedTo10} (Esperado: {isbn10})");
+            Console.WriteLine($"\n  ISBN-10 Original...: {isbn10} -> Convertido para 13: {convertedTo13}");
+            Console.WriteLine($"  ISBN-13 Original...: {isbn13} -> Convertido para 10: {convertedTo10}");
+
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("  ✓ Conversão de ISBN validada com sucesso!");
+            Console.WriteLine("  ✓ Validação e Conversão de ISBN testadas com sucesso!");
             Console.ResetColor();
         }
 
