@@ -1,10 +1,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.10.12201.205 stable
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQuery", "ISBNQuery\ISBNQuery.csproj", "{E9D181D1-D6A7-40B8-8C08-29C05F963351}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQueryTests", "ISBNQueryTests\ISBNQueryTests.csproj", "{8BA06B90-896A-41B5-848A-7083C0F4710C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISBNQueryDemo", "ISBNQueryDemo\ISBNQueryDemo.csproj", "{3A76C01B-94F5-4E7B-A504-2454659D71C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{8BA06B90-896A-41B5-848A-7083C0F4710C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BA06B90-896A-41B5-848A-7083C0F4710C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BA06B90-896A-41B5-848A-7083C0F4710C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A76C01B-94F5-4E7B-A504-2454659D71C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A76C01B-94F5-4E7B-A504-2454659D71C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A76C01B-94F5-4E7B-A504-2454659D71C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A76C01B-94F5-4E7B-A504-2454659D71C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
